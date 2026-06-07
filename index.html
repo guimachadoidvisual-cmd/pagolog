@@ -451,7 +451,7 @@ const SUPABASE_URL='https://lxuexebyqjrpiugkaegz.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4dWV4ZWJ5cWpycGl1Z2thZWd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2ODIwODQsImV4cCI6MjA5NjI1ODA4NH0.3n-DBhFvjAp5oDwzdzj3BALarq7ccCRm1sTKsGKkrh4';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let clientes=[],produtos=[],msgTemplate=`Olá, {{nome}}! 👋\n\nSegue o resumo do seu fiado:\n\n{{resumo}}\n\n*Total: {{total}}*\n\nQuando puder, me faz o pix! 🙏`;
+let clientes=[],produtos=[],msgTemplate=`Ola, {{nome}}!\n\nSegue o resumo do seu fiado:\n\n{{resumo}}\n\n*Total: {{total}}*\n\nQuando puder, me faz o pix!`;
 let vendaClienteId=null,vendaCarrinho={},editClienteId=null,voltarDetalhe='screen-home';
 let currentUser=null,userName='';
 
@@ -835,7 +835,7 @@ function inserirTag(tag){
 }
 function buildMsg(template,cliente){
   const total=getTotal(cliente);
-  const resumo=(cliente.fiados||[]).flatMap(f=>(f.itens||[]).map(i=>`• ${i.nome} x${i.qtd} = R$ ${(i.preco*i.qtd).toFixed(2)}`)).join('\n')||'• (sem compras)';
+  const resumo=(cliente.fiados||[]).flatMap(f=>(f.itens||[]).map(i=>`- ${i.qtd}x ${i.nome} = R$ ${(i.preco*i.qtd).toFixed(2)}`)).join('\n')||'• (sem compras)';
   return template
     .replace(/{{nome}}/g,cliente.nome.split(' ')[0])
     .replace(/{{nome_completo}}/g,cliente.nome)
