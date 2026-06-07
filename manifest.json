@@ -1,18 +1,39 @@
 {
-  "name": "Fiado",
-  "short_name": "Fiado",
+  "name": "PagoLogo",
+  "short_name": "PagoLogo",
   "description": "Controle de vendas a prazo com envio via WhatsApp",
-  "start_url": "/",
+  "start_url": "/pagolog/",
+  "scope": "/pagolog/",
   "display": "standalone",
-  "background_color": "#f5f5f0",
-  "theme_color": "#1A5C38",
+  "background_color": "#111111",
+  "theme_color": "#111111",
   "orientation": "portrait",
+  "lang": "pt-BR",
+  "categories": ["business", "finance"],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231A5C38'/><text y='.9em' font-size='70' x='15'>🧾</text></svg>",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
