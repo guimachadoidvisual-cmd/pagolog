@@ -173,7 +173,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .upgrade-modal-bg.open{display:flex}
 .upgrade-modal{width:100%;max-width:400px;background:linear-gradient(145deg,#1a1a1a,#111);border:1.5px solid rgba(34,197,94,.55);box-shadow:0 0 32px rgba(34,197,94,.22),0 0 80px rgba(34,197,94,.08),inset 0 1px 0 rgba(34,197,94,.15);border-radius:28px;padding:26px 22px 22px;position:relative}
 .pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,#22c55e,#16a34a);color:#000;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.05em}
-.upgrade-check{width:18px;height:18px;border-radius:50%;background:rgba(34,197,94,.15);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.upgrade-check{width:18px;height:18px;border-radius:50%;background:rgba(34,197,94,.15);border:1.5px solid var(--green);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -345,7 +345,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       Clientes
     </button>
     <button class="btn-sec" onclick="abrirModalCliente(null)">+ Cadastrar cliente</button>
-    <div id="limite-clientes-info" style="font-size:12px;color:#555;text-align:center;margin-bottom:12px"></div>
+    <div id="limite-clientes-info" style="margin-bottom:14px"></div>
     <div id="lista-clientes"></div>
   </div>
 
@@ -726,10 +726,21 @@ function renderClientes(){
   if(limiteEl){
     if(!isPro){
       const restam=MAX_FREE_CLIENTES-clientes.length;
-      if(restam<=0)limiteEl.innerHTML='<span style="color:#ef4444">Limite atingido ('+clientes.length+'/'+MAX_FREE_CLIENTES+')</span> — <button onclick="openUpgrade()" style="background:none;border:none;color:var(--green);font-size:12px;cursor:pointer;font-weight:600">Assinar Pro</button>';
-      else limiteEl.textContent=clientes.length+'/'+MAX_FREE_CLIENTES+' clientes no plano gratuito';
+      if(restam<=0){
+        limiteEl.innerHTML=`
+          <div onclick="openUpgrade()" style="cursor:pointer;background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(34,197,94,.04));border:1.5px solid rgba(34,197,94,.4);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 0 16px rgba(34,197,94,.1)">
+            <span style="font-size:22px">🔒</span>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px">Limite de clientes atingido</div>
+              <div style="font-size:11px;color:#666">Assine o Pro para cadastrar sem limites</div>
+            </div>
+            <span style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#000;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px">PRO</span>
+          </div>`;
+      } else {
+        limiteEl.innerHTML=`<div style="font-size:11px;color:#444;text-align:center;padding:4px 0">${clientes.length}/${MAX_FREE_CLIENTES} clientes usados no plano gratuito</div>`;
+      }
     } else {
-      limiteEl.innerHTML='<span style="color:var(--green)">✓ Clientes ilimitados</span>';
+      limiteEl.innerHTML='<div style="font-size:11px;color:var(--green);text-align:center;padding:4px 0">● Clientes ilimitados</div>';
     }
   }
   const el=document.getElementById('lista-clientes');
@@ -773,6 +784,12 @@ async function saveCliente(){
   const nome=document.getElementById('novo-cliente-nome').value.trim();
   const tel=document.getElementById('novo-cliente-tel').value.trim().replace(/\D/g,'');
   if(!nome||!tel){showToast('Preencha todos os campos');return}
+  // Bloqueia insert (não edição) se limite atingido
+  if(!editClienteId && !isPro && clientes.length>=MAX_FREE_CLIENTES){
+    closeModal('modal-add-cliente');
+    openUpgrade();
+    return;
+  }
   setLoading('btn-salvar-cliente',true);showSaving();
   let error;
   if(editClienteId){({error}=await sb.from('clientes').update({nome,tel}).eq('id',editClienteId));}
