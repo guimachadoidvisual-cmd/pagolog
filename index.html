@@ -338,6 +338,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       Clientes
     </button>
     <button class="btn-sec" onclick="abrirModalCliente(null)">+ Cadastrar cliente</button>
+    <div id="limite-clientes-info" style="font-size:12px;color:#555;text-align:center;margin-bottom:12px"></div>
     <div id="lista-clientes"></div>
   </div>
 
@@ -454,6 +455,9 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let clientes=[],produtos=[],msgTemplate=`Ola, {{nome}}!\n\nSegue o resumo do seu fiado:\n\n{{resumo}}\n\n*Total: {{total}}*\n\nQuando puder, me faz o pix!`;
 let vendaClienteId=null,vendaCarrinho={},editClienteId=null,voltarDetalhe='screen-home';
 let currentUser=null,userName='';
+let isPro=false;
+const MP_PLAN_URL='https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=4c0605fb626c4e3990c381df0bd86c79';
+const MAX_FREE_CLIENTES=5;
 
 const TAGS=[
   {id:'{{nome}}',label:'Primeiro nome'},{id:'{{nome_completo}}',label:'Nome completo'},
@@ -543,19 +547,25 @@ async function init(){
 
 // ── LOAD ──────────────────────────────────────────────────
 async function loadClientes(){
-  const{data:cs,error:ce}=await sb.from('clientes').select('*').order('nome');
+  const uid=currentUser?.id;
+  if(!uid)return;
+  const{data:cs,error:ce}=await sb.from('clientes').select('*').eq('user_id',uid).order('nome');
   if(ce)throw ce;
   const{data:fs,error:fe}=await sb.from('fiados').select('*').order('created_at');
   if(fe)throw fe;
   clientes=(cs||[]).map(c=>({...c,fiados:(fs||[]).filter(f=>f.cliente_id===c.id).map(f=>({...f,itens:typeof f.itens==='string'?JSON.parse(f.itens):f.itens}))}));
 }
 async function loadProdutos(){
-  const{data,error}=await sb.from('produtos').select('*').order('nome');
+  const uid=currentUser?.id;
+  if(!uid)return;
+  const{data,error}=await sb.from('produtos').select('*').eq('user_id',uid).order('nome');
   if(error)throw error;
   produtos=data||[];
 }
 async function loadMensagem(){
-  const{data,error}=await sb.from('config').select('*').eq('chave','mensagem').single();
+  const uid=currentUser?.id;
+  if(!uid)return;
+  const{data,error}=await sb.from('config').select('*').eq('chave','mensagem').eq('user_id',uid).single();
   if(!error&&data)msgTemplate=data.valor;
 }
 
@@ -670,6 +680,17 @@ async function confirmarVenda(){
 
 // ── CLIENTES ──────────────────────────────────────────────
 function renderClientes(){
+  // Mostrar info de limite
+  const limiteEl=document.getElementById('limite-clientes-info');
+  if(limiteEl){
+    if(!isPro){
+      const restam=MAX_FREE_CLIENTES-clientes.length;
+      if(restam<=0)limiteEl.innerHTML='<span style="color:#ef4444">Limite atingido ('+clientes.length+'/'+MAX_FREE_CLIENTES+')</span> — <button onclick="openUpgrade()" style="background:none;border:none;color:var(--green);font-size:12px;cursor:pointer;font-weight:600">Assinar Pro</button>';
+      else limiteEl.textContent=clientes.length+'/'+MAX_FREE_CLIENTES+' clientes no plano gratuito';
+    } else {
+      limiteEl.innerHTML='<span style="color:var(--green)">✓ Clientes ilimitados</span>';
+    }
+  }
   const el=document.getElementById('lista-clientes');
   if(!clientes.length){el.innerHTML='<div class="empty">Nenhum cliente cadastrado</div>';return}
   el.innerHTML=clientes.map(c=>`
@@ -714,7 +735,7 @@ async function saveCliente(){
   setLoading('btn-salvar-cliente',true);showSaving();
   let error;
   if(editClienteId){({error}=await sb.from('clientes').update({nome,tel}).eq('id',editClienteId));}
-  else{({error}=await sb.from('clientes').insert({nome,tel}));}
+  else{({error}=await sb.from('clientes').insert({nome,tel,user_id:currentUser?.id}));}
   setLoading('btn-salvar-cliente',false);
   if(error){showToast('Erro: '+error.message);return}
   await loadClientes();
@@ -803,7 +824,7 @@ async function addProduto(){
   const preco=parseFloat(document.getElementById('novo-prod-preco').value);
   if(!nome||isNaN(preco)||preco<=0){showToast('Preencha todos os campos');return}
   setLoading('btn-salvar-produto',true);showSaving();
-  const{error}=await sb.from('produtos').insert({nome,preco});
+  const{error}=await sb.from('produtos').insert({nome,preco,user_id:currentUser?.id});
   setLoading('btn-salvar-produto',false);
   if(error){showToast('Erro: '+error.message);return}
   await loadProdutos();
@@ -852,7 +873,7 @@ function renderPreview(){
 async function salvarMensagem(){
   msgTemplate=document.getElementById('msg-editor').value;
   showSaving();
-  const{error}=await sb.from('config').upsert({chave:'mensagem',valor:msgTemplate},{onConflict:'chave'});
+  const{error}=await sb.from('config').upsert({chave:'mensagem',valor:msgTemplate,user_id:currentUser?.id},{onConflict:'chave'});
   if(error){showToast('Erro ao salvar');return}
   showToast('Mensagem salva! ✅');
 }
@@ -919,10 +940,51 @@ async function logout(){
   document.getElementById('auth-email').value='';
   document.getElementById('auth-senha').value='';
 }
-function entrarNoApp(user){
+async function entrarNoApp(user){
   currentUser=user;
   document.getElementById('auth-screen').classList.remove('active');
+  await checkSubscription();
   init();
+}
+
+// ── ASSINATURA ───────────────────────────────────────────
+async function checkSubscription(){
+  if(!currentUser)return;
+  try{
+    const{data,error}=await sb.from('assinaturas').select('*').eq('user_id',currentUser.id).eq('status','active').single();
+    isPro=!!data&&!error;
+  }catch(e){isPro=false;}
+  updateProUI();
+}
+
+function updateProUI(){
+  // Atualiza badge no header
+  const badge=document.getElementById('pro-badge-header');
+  if(badge)badge.style.display=isPro?'inline-flex':'none';
+  // Remove ou mostra anúncios
+  document.querySelectorAll('.ad-banner').forEach(ad=>{
+    ad.style.display=isPro?'none':'flex';
+  });
+}
+
+function openUpgrade(){
+  document.getElementById('upgrade-modal').classList.add('open');
+}
+function closeUpgrade(){
+  document.getElementById('upgrade-modal').classList.remove('open');
+}
+function assinar(){
+  window.open(MP_PLAN_URL,'_blank');
+  closeUpgrade();
+  showToast('Após assinar, reinicie o app para ativar o Pro!');
+}
+
+function checkLimiteClientes(){
+  if(!isPro&&clientes.length>=MAX_FREE_CLIENTES){
+    openUpgrade();
+    return false;
+  }
+  return true;
 }
 
 // ── START ─────────────────────────────────────────────────
@@ -934,5 +996,33 @@ sb.auth.onAuthStateChange((event,session)=>{
   if(event==='SIGNED_IN'&&session)entrarNoApp(session.user);
 });
 </script>
+
+<!-- UPGRADE MODAL -->
+<div class="upgrade-modal-bg" id="upgrade-modal">
+  <div class="upgrade-modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <span class="pro-badge">PRO</span>
+      <button onclick="closeUpgrade()" style="background:none;border:none;color:#555;font-size:22px;cursor:pointer">×</button>
+    </div>
+    <div class="upgrade-title">Desbloqueie o<br>PagoLogo Pro</div>
+    <div class="upgrade-sub">Você atingiu o limite do plano gratuito. Assine e use sem limites!</div>
+    <div class="upgrade-features">
+      <div class="upgrade-feature"><span>✓</span> Clientes ilimitados</div>
+      <div class="upgrade-feature"><span>✓</span> Sem anúncios</div>
+      <div class="upgrade-feature"><span>✓</span> Produtos ilimitados</div>
+      <div class="upgrade-feature"><span>✓</span> Histórico completo</div>
+      <div class="upgrade-feature"><span>✓</span> Suporte prioritário</div>
+    </div>
+    <div class="upgrade-price">
+      <strong>R$ 19,90</strong><br>
+      <em>por mês · cancele quando quiser</em>
+    </div>
+    <button class="btn-main" style="margin-bottom:10px" onclick="assinar()">
+      Assinar agora →
+    </button>
+    <button class="btn-sec" style="margin:0;font-size:13px;color:#555" onclick="closeUpgrade()">Continuar no plano gratuito</button>
+  </div>
+</div>
+
 </body>
 </html>
