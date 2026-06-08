@@ -1009,8 +1009,8 @@ async function entrarNoApp(user){
 async function checkSubscription(){
   if(!currentUser)return;
   try{
-    const{data,error}=await sb.from('assinaturas').select('*').eq('user_id',currentUser.id).eq('status','active').single();
-    isPro=!!data&&!error;
+    const{data,error}=await sb.from('assinaturas').select('*').eq('user_id',currentUser.id).eq('status','active');
+    isPro=!error&&Array.isArray(data)&&data.length>0;
   }catch(e){isPro=false;}
   updateProUI();
 }
