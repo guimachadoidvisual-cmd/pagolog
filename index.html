@@ -167,6 +167,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .saving-indicator{position:fixed;top:16px;right:16px;background:var(--green);color:#111;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;transition:opacity .3s;z-index:9997}
 .saving-indicator.show{opacity:1}
 .empty{text-align:center;padding:40px 20px;color:#555;font-size:14px}
+
+/* UPGRADE MODAL */
+.upgrade-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;align-items:center;justify-content:center;padding:20px}
+.upgrade-modal-bg.open{display:flex}
+.upgrade-modal{width:100%;max-width:400px;background:linear-gradient(145deg,#1a1a1a,#111);border:1.5px solid rgba(34,197,94,.55);box-shadow:0 0 32px rgba(34,197,94,.22),0 0 80px rgba(34,197,94,.08),inset 0 1px 0 rgba(34,197,94,.15);border-radius:28px;padding:26px 22px 22px;position:relative}
+.pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,#22c55e,#16a34a);color:#000;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.05em}
+.upgrade-check{width:18px;height:18px;border-radius:50%;background:rgba(34,197,94,.15);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -373,6 +380,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       Voltar
     </button>
     <div id="detalhe-content"></div>
+  </div>
+
+  <!-- ASSINAR PRO -->
+  <div class="screen" id="screen-assinar-pro">
+    <button class="btn-back" onclick="goTo('screen-home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Voltar
+    </button>
+    <div style="margin-top:8px;margin-bottom:22px">
+      <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:5px">PagoLogo Pro</div>
+      <div style="font-size:12px;color:#555">Pagamento seguro via Mercado Pago</div>
+    </div>
+    <div style="background:linear-gradient(145deg,#1a1a1a,#111);border:1.5px solid rgba(34,197,94,.5);box-shadow:0 0 28px rgba(34,197,94,.18);border-radius:22px;padding:22px;margin-bottom:20px">
+      <div style="font-size:28px;font-weight:900;color:#fff;margin-bottom:2px">R$ 9,90<span style="font-size:12px;font-weight:400;color:#555">/mês</span></div>
+      <div style="font-size:11px;color:#444;margin-bottom:18px">Cancele quando quiser</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#ccc">
+          <span class="upgrade-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Clientes e produtos ilimitados
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#ccc">
+          <span class="upgrade-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Sem anúncios
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#ccc">
+          <span class="upgrade-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Suporte prioritário
+        </div>
+      </div>
+    </div>
+    <button class="btn-main" id="btn-checkout-mp" onclick="iniciarCheckoutMP()" style="font-size:15px">
+      Pagar com Mercado Pago →
+    </button>
+    <div style="text-align:center;font-size:10px;color:#333;margin-top:12px">Ambiente seguro · SSL · Seus dados protegidos</div>
   </div>
 </div>
 
@@ -973,10 +1014,23 @@ function openUpgrade(){
 function closeUpgrade(){
   document.getElementById('upgrade-modal').classList.remove('open');
 }
-function assinar(){
-  window.open(MP_PLAN_URL,'_blank');
+function abrirPaginaAssinar(){
   closeUpgrade();
-  showToast('Após assinar, reinicie o app para ativar o Pro!');
+  goTo('screen-assinar-pro');
+}
+async function iniciarCheckoutMP(){
+  const btn=document.getElementById('btn-checkout-mp');
+  btn.disabled=true;btn.textContent='Redirecionando...';
+  try{
+    // Para ocultar o link do MP, crie uma função Edge no Supabase que retorne o init_point.
+    // Exemplo: const r=await fetch('/api/criar-assinatura',{method:'POST',...});
+    // const{init_point}=await r.json(); window.open(init_point,'_blank');
+    window.open(MP_PLAN_URL,'_blank');
+    showToast('Após assinar, reinicie o app para ativar o Pro!');
+  }catch(e){
+    showToast('Erro ao abrir checkout. Tente novamente.');
+  }
+  btn.disabled=false;btn.textContent='Pagar com Mercado Pago →';
 }
 
 function checkLimiteClientes(){
@@ -998,25 +1052,32 @@ sb.auth.onAuthStateChange((event,session)=>{
 </script>
 
 <!-- UPGRADE MODAL -->
-<center><div class="upgrade-modal-bg" id="upgrade-modal">
+<div class="upgrade-modal-bg" id="upgrade-modal">
   <div class="upgrade-modal">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <span class="pro-badge">PRO</span>
-      <button onclick="closeUpgrade()" style="background:none;border:none;color:#555;font-size:22px;cursor:pointer">×</button>
+      <button onclick="closeUpgrade()" style="background:none;border:none;color:#555;font-size:22px;cursor:pointer;line-height:1">×</button>
     </div>
-    <div class="upgrade-title">Desbloqueie o<br>PagoLogo Pro</div>
-    <div class="upgrade-sub">Você atingiu o limite do plano gratuito. Assine e use sem limites!</div>
-    <div class="upgrade-features">
-      <div class="upgrade-feature"><span>✓</span> Clientes ilimitados</div>
-      <div class="upgrade-feature"><span>✓</span> Produtos ilimitados</div>
+    <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.25">Desbloqueie o<br>PagoLogo Pro</div>
+    <div style="font-size:11px;color:#555;margin-bottom:16px">Limite gratuito atingido. Use sem limites!</div>
+    <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:10px;font-size:11px;color:#ccc">
+        <span class="upgrade-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        Clientes ilimitados
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:11px;color:#ccc">
+        <span class="upgrade-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        Produtos ilimitados
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:11px;color:#ccc">
+        <span class="upgrade-check"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        Sem anúncios
+      </div>
     </div>
-    <div class="upgrade-price">
- </div>
-    <button class="btn-main" style="margin-bottom:10px" onclick="assinar()">
-      R$ 9,90/mês →
+    <button class="btn-main" style="margin-bottom:8px;font-size:14px;padding:14px" onclick="abrirPaginaAssinar()">
+      Assinar Pro — R$ 9,90/mês →
     </button>
-    <button class="btn-sec" style="margin:0;font-size:13px;color:#555" onclick="closeUpgrade()">Continuar no plano gratuito</button>
-    </center>
+    <button class="btn-sec" style="margin:0;font-size:11px;color:#444;padding:10px" onclick="closeUpgrade()">Continuar no plano gratuito</button>
   </div>
 </div>
 
