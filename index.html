@@ -35,6 +35,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .auth-tab.active{background:#1a1a1a;color:var(--green);box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .auth-error{background:#2a1a1a;color:#ef4444;border:1px solid #3a2a2a;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:12px;display:none}
 .auth-error.show{display:block}
+.input-password-wrap{position:relative;margin-bottom:12px}
+.input-password-wrap .input-field{margin-bottom:0;padding-right:46px}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#555;padding:4px;display:flex;align-items:center;justify-content:center;-webkit-appearance:none}
+.eye-btn:active{color:#888}
+.cadastro-only{display:none}
 
 /* HEADER */
 .header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 20px}
@@ -226,9 +231,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <div class="auth-error" id="auth-error"></div>
     <input class="input-field" id="auth-email" type="email" placeholder="Seu e-mail" autocomplete="email">
-    <input class="input-field" id="auth-senha" type="password" placeholder="Senha" autocomplete="current-password">
+    <div class="input-password-wrap">
+      <input class="input-field" id="auth-senha" type="password" placeholder="Senha" autocomplete="current-password">
+      <button class="eye-btn" type="button" onclick="toggleSenha('auth-senha','eye-senha')" id="eye-senha">
+        <svg id="eye-senha-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div class="input-password-wrap cadastro-only" id="wrap-confirmar-senha">
+      <input class="input-field" id="auth-senha-confirm" type="password" placeholder="Repetir senha" autocomplete="new-password">
+      <button class="eye-btn" type="button" onclick="toggleSenha('auth-senha-confirm','eye-confirm')" id="eye-confirm">
+        <svg id="eye-confirm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
     <button class="btn-main" id="btn-auth" onclick="fazerAuth()">Entrar</button>
-    <div style="text-align:center">
+    <div style="text-align:center" id="wrap-esqueci">
       <button onclick="esqueceuSenha()" style="background:none;border:none;color:#555;font-size:13px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button>
     </div>
   </div>
@@ -1008,14 +1024,41 @@ function switchTab(tab){
   document.getElementById('tab-cadastro').classList.toggle('active',tab==='cadastro');
   document.getElementById('btn-auth').textContent=tab==='login'?'Entrar':'Criar conta';
   document.getElementById('auth-error').classList.remove('show');
+  // Mostrar/ocultar campo confirmar senha
+  const confirmWrap=document.getElementById('wrap-confirmar-senha');
+  const esqueciWrap=document.getElementById('wrap-esqueci');
+  if(tab==='cadastro'){
+    confirmWrap.style.display='block';
+    esqueciWrap.style.display='none';
+    document.getElementById('auth-senha-confirm').value='';
+  } else {
+    confirmWrap.style.display='none';
+    esqueciWrap.style.display='block';
+  }
 }
 function showAuthError(msg){
   const el=document.getElementById('auth-error');el.textContent=msg;el.classList.add('show');
+}
+function toggleSenha(inputId,btnId){
+  const inp=document.getElementById(inputId);
+  const isHidden=inp.type==='password';
+  inp.type=isHidden?'text':'password';
+  const icon=document.getElementById(btnId+'-icon');
+  if(isHidden){
+    icon.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    icon.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
 }
 async function fazerAuth(){
   const email=document.getElementById('auth-email').value.trim();
   const senha=document.getElementById('auth-senha').value;
   if(!email||!senha){showAuthError('Preencha e-mail e senha');return}
+  if(currentTab==='cadastro'){
+    const senhaConfirm=document.getElementById('auth-senha-confirm').value;
+    if(!senhaConfirm){showAuthError('Repita a senha');return}
+    if(senha!==senhaConfirm){showAuthError('As senhas não conferem');return}
+  }
   const btn=document.getElementById('btn-auth');btn.disabled=true;btn.textContent='Aguarde...';
   document.getElementById('auth-error').classList.remove('show');
   let result;
@@ -1026,8 +1069,15 @@ async function fazerAuth(){
     const msgs={'Invalid login credentials':'E-mail ou senha incorretos','User already registered':'E-mail já cadastrado. Faça login.','Password should be at least 6 characters':'Senha mínima: 6 caracteres'};
     showAuthError(msgs[result.error.message]||result.error.message);return;
   }
-  if(currentTab==='cadastro'&&!result.data?.session){
-    showAuthError('Conta criada! Faça login agora.');switchTab('login');return;
+  if(currentTab==='cadastro'){
+    // Tenta logar direto após cadastro
+    if(result.data?.session){
+      entrarNoApp(result.data.user);return;
+    }
+    // Se email confirmation estiver ativo, faz login manual
+    const loginResult=await sb.auth.signInWithPassword({email,password:senha});
+    if(loginResult.error){showAuthError('Conta criada! Faça login agora.');switchTab('login');return;}
+    entrarNoApp(loginResult.data.user);return;
   }
   entrarNoApp(result.data.user);
 }
@@ -1043,6 +1093,8 @@ async function logout(){
   document.getElementById('auth-screen').classList.add('active');
   document.getElementById('auth-email').value='';
   document.getElementById('auth-senha').value='';
+  document.getElementById('auth-senha-confirm').value='';
+  switchTab('login');
 }
 async function entrarNoApp(user){
   currentUser=user;
