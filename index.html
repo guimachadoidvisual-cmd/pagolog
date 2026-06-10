@@ -512,10 +512,6 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let clientes=[],produtos=[],msgTemplate=`Ola, {{nome}}!\n\nSegue o resumo do seu fiado:\n\n{{resumo}}\n\n*Total: {{total}}*\n\nQuando puder, me faz o pix!`;
 let vendaClienteId=null,vendaCarrinho={},editClienteId=null,voltarDetalhe='screen-home';
 let currentUser=null,userName='';
-let isPro=false;
-const MP_PLAN_URL='https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=4c0605fb626c4e3990c381df0bd86c79';
-const MAX_FREE_CLIENTES=5;
-
 const TAGS=[
   {id:'{{nome}}',label:'Primeiro nome'},{id:'{{nome_completo}}',label:'Nome completo'},
   {id:'{{total}}',label:'Total devido'},{id:'{{resumo}}',label:'Resumo das compras'},
@@ -742,28 +738,6 @@ async function confirmarVenda(){
 
 // ── CLIENTES ──────────────────────────────────────────────
 function renderClientes(){
-  // Mostrar info de limite
-  const limiteEl=document.getElementById('limite-clientes-info');
-  if(limiteEl){
-    if(!isPro){
-      const restam=MAX_FREE_CLIENTES-clientes.length;
-      if(restam<=0){
-        limiteEl.innerHTML=`
-          <div onclick="openUpgrade()" style="cursor:pointer;background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(34,197,94,.04));border:1.5px solid rgba(34,197,94,.4);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 0 16px rgba(34,197,94,.1)">
-            <span style="font-size:22px">🔒</span>
-            <div style="flex:1">
-              <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px">Limite de clientes atingido</div>
-              <div style="font-size:11px;color:#666">Assine o Pro para cadastrar sem limites</div>
-            </div>
-            <span style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#000;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px">PRO</span>
-          </div>`;
-      } else {
-        limiteEl.innerHTML=`<div style="font-size:11px;color:#444;text-align:center;padding:4px 0">${clientes.length}/${MAX_FREE_CLIENTES} clientes usados no plano gratuito</div>`;
-      }
-    } else {
-      limiteEl.innerHTML='<div style="font-size:11px;color:var(--green);text-align:center;padding:4px 0">● Clientes ilimitados</div>';
-    }
-  }
   const el=document.getElementById('lista-clientes');
   if(!clientes.length){el.innerHTML='<div class="empty">Nenhum cliente cadastrado</div>';return}
   el.innerHTML=clientes.map(c=>`
@@ -1099,7 +1073,6 @@ async function logout(){
 async function entrarNoApp(user){
   currentUser=user;
   document.getElementById('auth-screen').classList.remove('active');
-  await checkSubscription();
   init();
 }
 
@@ -1113,22 +1086,11 @@ async function checkSubscription(){
   updateProUI();
 }
 
-function updateProUI(){
-  // Atualiza badge no header
-  const badge=document.getElementById('pro-badge-header');
-  if(badge)badge.style.display=isPro?'inline-flex':'none';
-  // Remove ou mostra anúncios
-  document.querySelectorAll('.ad-banner').forEach(ad=>{
-    ad.style.display=isPro?'none':'flex';
-  });
+);
 }
 
-function openUpgrade(){
-  document.getElementById('upgrade-modal').classList.add('open');
-}
-function closeUpgrade(){
-  document.getElementById('upgrade-modal').classList.remove('open');
-}
+
+
 function abrirPaginaAssinar(){
   closeUpgrade();
   goTo('screen-assinar-pro');
@@ -1148,11 +1110,7 @@ async function iniciarCheckoutMP(){
   btn.disabled=false;btn.textContent='Pagar com Mercado Pago →';
 }
 
-function checkLimiteClientes(){
-  if(!isPro&&clientes.length>=MAX_FREE_CLIENTES){
-    openUpgrade();
-    return false;
-  }
+
   return true;
 }
 
@@ -1166,13 +1124,6 @@ sb.auth.onAuthStateChange((event,session)=>{
 });
 </script>
 
-<!-- UPGRADE MODAL -->
-<div class="upgrade-modal-bg" id="upgrade-modal">
-  <div class="upgrade-modal">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <span class="pro-badge">PRO</span>
-      <button onclick="closeUpgrade()" style="background:none;border:none;color:#555;font-size:22px;cursor:pointer;line-height:1">×</button>
-    </div>
     <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.25">Desbloqueie o<br>PagoLogo Pro</div>
     <div style="font-size:11px;color:#555;margin-bottom:16px">Limite gratuito atingido. Use sem limites!</div>
     <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:18px">
