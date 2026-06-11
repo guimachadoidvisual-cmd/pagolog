@@ -458,6 +458,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<!-- MODAL EDITAR FIADO -->
+<div class="modal-overlay" id="modal-edit-fiado">
+  <div class="modal">
+    <div class="modal-title">Editar compra</div>
+    <div id="edit-fiado-itens-wrap"></div>
+    <div style="padding:10px 0 4px;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:.06em">Data da compra</div>
+    <input class="input-field" id="edit-fiado-data" type="date">
+    <button class="btn-main" id="btn-salvar-fiado" onclick="salvarEdicaoFiado()">✅ Salvar</button>
+    <button class="btn-sec" onclick="closeModal('modal-edit-fiado')">Cancelar</button>
+  </div>
+</div>
+
 <!-- MODAL EDITAR PAGAMENTO -->
 <div class="modal-overlay" id="modal-edit-pagamento">
   <div class="modal">
@@ -528,8 +540,15 @@ async function salvarNome(){
   if(!userName)return;
   localStorage.setItem('pagologo_name',userName);
   document.getElementById('home-username').textContent='Olá, '+userName+'! 👋';
-  showToast('Nome salvo!');
+  await sb.from('config').upsert({chave:'nome_usuario',valor:userName,user_id:currentUser?.id},{onConflict:'chave'});
+  showToast('Nome salvo! ✅');
   closeHamburger();
+}
+async function loadNome(){
+  const uid=currentUser?.id;if(!uid)return;
+  const{data}=await sb.from('config').select('*').eq('chave','nome_usuario').eq('user_id',uid).single();
+  if(data?.valor){userName=data.valor;localStorage.setItem('pagologo_name',userName);}
+  else{userName=localStorage.getItem('pagologo_name')||'';}
 }
 
 // ── NAV ───────────────────────────────────────────────────
@@ -572,10 +591,9 @@ function goTo(id){
 // ── INIT ──────────────────────────────────────────────────
 async function init(){
   try{
-    await Promise.all([loadClientes(),loadProdutos(),loadMensagem()]);
+    await Promise.all([loadClientes(),loadProdutos(),loadMensagem(),loadNome()]);
   }catch(e){showToast('Erro ao carregar dados');console.error(e)}
   document.getElementById('loading-screen').style.display='none';
-  userName=localStorage.getItem('pagologo_name')||'';
   document.getElementById('home-username').textContent=userName?'Olá, '+userName+'! 👋':'Olá! 👋';
   renderHome();
 }
@@ -865,10 +883,18 @@ function showDetalhe(id,voltarPara){
     <div style="margin-top:20px">
       <div class="section-label">Compras em aberto</div>
       ${c.fiados.length?c.fiados.slice().reverse().map(f=>`
-        <div style="margin-bottom:12px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:14px">
-          <div style="font-size:12px;color:#555;margin-bottom:8px">📅 ${f.data}</div>
-          ${(f.itens||[]).map(i=>`<div class="fiado-item"><span>${i.nome} x${i.qtd}</span><span>R$ ${(i.preco*i.qtd).toFixed(2)}</span></div>`).join('')}
-          <div style="display:flex;justify-content:flex-end;padding-top:8px;font-size:13px;font-weight:700">R$ ${(f.itens||[]).reduce((a,i)=>a+i.preco*i.qtd,0).toFixed(2)}</div>
+        <div style="margin-bottom:12px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid #222">
+            <div style="font-size:12px;color:#555">📅 ${f.data}</div>
+            <div style="display:flex;gap:6px">
+              <button class="icon-btn" style="font-size:12px;padding:5px 8px" data-edit-fiado="${f.id}" data-fiado-cid="${c.id}">✏️</button>
+              <button class="icon-btn" style="font-size:12px;padding:5px 8px" data-del-fiado="${f.id}" data-fiado-cid="${c.id}">🗑️</button>
+            </div>
+          </div>
+          <div style="padding:10px 14px">
+            ${(f.itens||[]).map(i=>`<div class="fiado-item"><span>${i.nome} x${i.qtd}</span><span>R$ ${(i.preco*i.qtd).toFixed(2)}</span></div>`).join('')}
+            <div style="display:flex;justify-content:flex-end;padding-top:8px;font-size:13px;font-weight:700">R$ ${(f.itens||[]).reduce((a,i)=>a+i.preco*i.qtd,0).toFixed(2)}</div>
+          </div>
         </div>`).join(''):'<div class="empty" style="padding:20px 0">Nenhuma compra em aberto</div>'}
     </div>
     ${renderHistorico(c.pagamentos)}
@@ -876,10 +902,85 @@ function showDetalhe(id,voltarPara){
   document.querySelector('[data-edit-det]')?.addEventListener('click',()=>abrirModalCliente(id));
   document.querySelector('[data-wpp]')?.addEventListener('click',()=>enviarWpp(id));
   document.querySelector('[data-zerar]')?.addEventListener('click',()=>zerarDivida(id));
+  // Editar/excluir fiados individuais
+  document.querySelectorAll('[data-edit-fiado]').forEach(btn=>btn.addEventListener('click',()=>abrirEditFiado(btn.dataset.editFiado,btn.dataset.fiadoCid)));
+  document.querySelectorAll('[data-del-fiado]').forEach(btn=>btn.addEventListener('click',()=>confirmarExcluirFiado(btn.dataset.delFiado,btn.dataset.fiadoCid)));
   // Editar/excluir pagamentos
   document.querySelectorAll('[data-edit-pag]').forEach(btn=>btn.addEventListener('click',()=>abrirEditPagamento(btn.dataset.editPag,btn.dataset.pagCliente)));
   document.querySelectorAll('[data-del-pag]').forEach(btn=>btn.addEventListener('click',()=>confirmarExcluirPagamento(btn.dataset.delPag,btn.dataset.pagCliente)));
   goTo('screen-cliente-detalhe');
+}
+
+// ── EDITAR / EXCLUIR FIADO ────────────────────────────────
+let editFiadoId=null,editFiadoClienteId=null;
+
+function abrirEditFiado(fiadoId,clienteId){
+  editFiadoId=fiadoId;editFiadoClienteId=clienteId;
+  const c=clientes.find(c=>String(c.id)===String(clienteId));
+  const f=(c?.fiados||[]).find(f=>String(f.id)===String(fiadoId));
+  if(!f)return;
+  const itens=f.itens||[];
+  document.getElementById('edit-fiado-itens-wrap').innerHTML=`
+    <div style="font-size:12px;color:#555;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Itens</div>
+    ${itens.map((item,idx)=>`
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <input class="input-field" style="flex:2;margin-bottom:0" id="ef-nome-${idx}" value="${item.nome}" placeholder="Produto">
+        <input class="input-field" style="flex:1;margin-bottom:0" id="ef-qtd-${idx}" value="${item.qtd||1}" type="number" min="1" placeholder="Qtd">
+        <input class="input-field" style="flex:1;margin-bottom:0" id="ef-preco-${idx}" value="${item.preco}" type="number" step="0.01" min="0" placeholder="Preço">
+      </div>`).join('')}
+    <div style="font-size:11px;color:#555;margin-bottom:8px">${itens.length} item(s)</div>`;
+  // Converter data dd/mm para ISO
+  let dataISO='';
+  if(f.data){
+    const parts=f.data.split('/');
+    if(parts.length===3)dataISO=`${parts[2]}-${parts[1]}-${parts[0]}`;
+    else if(parts.length===2){const y=new Date().getFullYear();dataISO=`${y}-${parts[1]}-${parts[0]}`;}
+  }
+  document.getElementById('edit-fiado-data').value=dataISO;
+  openModal('modal-edit-fiado');
+}
+
+async function salvarEdicaoFiado(){
+  if(!editFiadoId)return;
+  const c=clientes.find(c=>String(c.id)===String(editFiadoClienteId));
+  const f=(c?.fiados||[]).find(f=>String(f.id)===String(editFiadoId));
+  if(!f)return;
+  const itensOrig=f.itens||[];
+  const novosItens=itensOrig.map((item,idx)=>{
+    const nome=document.getElementById(`ef-nome-${idx}`)?.value.trim()||item.nome;
+    const qtd=parseInt(document.getElementById(`ef-qtd-${idx}`)?.value)||item.qtd||1;
+    const preco=parseFloat(document.getElementById(`ef-preco-${idx}`)?.value)||item.preco;
+    return{...item,nome,qtd,preco};
+  });
+  const dataISO=document.getElementById('edit-fiado-data').value;
+  let dataDisplay=f.data;
+  if(dataISO){const[y,m,d]=dataISO.split('-');dataDisplay=`${d}/${m}`;}
+  const btn=document.getElementById('btn-salvar-fiado');btn.disabled=true;btn.textContent='Salvando...';
+  showSaving();
+  const{error}=await sb.from('fiados').update({data:dataDisplay,itens:JSON.stringify(novosItens)}).eq('id',editFiadoId);
+  btn.disabled=false;btn.textContent='✅ Salvar';
+  if(error){showToast('Erro ao salvar');return;}
+  closeModal('modal-edit-fiado');
+  await loadClientes();
+  showToast('Compra atualizada! ✅');
+  showDetalhe(editFiadoClienteId,voltarDetalhe);
+}
+
+function confirmarExcluirFiado(fiadoId,clienteId){
+  const c=clientes.find(c=>String(c.id)===String(clienteId));
+  const f=(c?.fiados||[]).find(f=>String(f.id)===String(fiadoId));
+  const val=(f?.itens||[]).reduce((a,i)=>a+i.preco*i.qtd,0);
+  document.getElementById('confirm-title').textContent='Excluir compra';
+  document.getElementById('confirm-msg').textContent=`Deseja excluir esta compra de R$ ${val.toFixed(2)} (${f?.data})? Esta ação não pode ser desfeita.`;
+  document.getElementById('confirm-ok').onclick=async()=>{
+    showSaving();
+    await sb.from('fiados').delete().eq('id',fiadoId);
+    await loadClientes();
+    closeModal('modal-confirm');
+    showToast('Compra excluída');
+    showDetalhe(clienteId,voltarDetalhe);
+  };
+  openModal('modal-confirm');
 }
 
 // ── EDITAR / EXCLUIR PAGAMENTO ────────────────────────────
