@@ -458,18 +458,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
-<!-- MODAL EDITAR PAGAMENTO -->
-<div class="modal-overlay" id="modal-edit-pagamento">
-  <div class="modal">
-    <div class="modal-title">Editar pedido</div>
-    <div id="edit-pag-itens-wrap"></div>
-    <div style="padding:10px 0 4px;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:.06em">Data do pedido</div>
-    <input class="input-field" id="edit-pag-data" type="date">
-    <button class="btn-main" id="btn-salvar-pag" onclick="salvarEdicaoPagamento()">✅ Salvar</button>
-    <button class="btn-sec" onclick="closeModal('modal-edit-pagamento')">Cancelar</button>
-  </div>
-</div>
-
 <!-- MODAL CONFIRM -->
 <div class="modal-overlay" id="modal-confirm">
   <div style="width:100%;display:flex;align-items:center;justify-content:center;padding:20px;min-height:200px">
@@ -601,12 +589,39 @@ async function loadClientes(){
   if(ce)throw ce;
   const{data:fs,error:fe}=await sb.from('fiados').select('*').order('created_at');
   if(fe)throw fe;
-  const{data:ps}=await sb.from('pagamentos').select('*').order('created_at');
-  clientes=(cs||[]).map(c=>({
-    ...c,
-    fiados:(fs||[]).filter(f=>f.cliente_id===c.id).map(f=>({...f,itens:typeof f.itens==='string'?JSON.parse(f.itens):f.itens})),
-    pagamentos:(ps||[]).filter(p=>p.cliente_id===c.id).map(p=>({...p,itens:p.itens?(typeof p.itens==='string'?JSON.parse(p.itens):p.itens):[]}))
-  }));
+  // Tenta carregar da tabela pagamentos (pode falhar por tipo incompatível)
+  let ps=[];
+  try{
+    const{data:psData}=await sb.from('pagamentos').select('*').eq('user_id',uid).order('created_at');
+    ps=psData||[];
+  }catch(e){ps=[];}
+
+  clientes=(cs||[]).map(c=>{
+    // Histórico salvo na coluna historico_pagamentos da tabela clientes
+    let histCliente=[];
+    if(c.historico_pagamentos){
+      histCliente=Array.isArray(c.historico_pagamentos)?c.historico_pagamentos:[];
+    }
+    // Histórico salvo localmente (fallback)
+    const histLocal=JSON.parse(localStorage.getItem('pagologo_hist_'+c.id)||'[]');
+    // Histórico da tabela pagamentos
+    const histPag=ps.filter(p=>String(p.cliente_id)===String(c.id)).map(p=>({
+      ...p,
+      itens:p.itens?(typeof p.itens==='string'?JSON.parse(p.itens):p.itens):[]
+    }));
+    // Mescla todos, evitando duplicatas por data+valor
+    const todoHist=[...histCliente,...histLocal,...histPag];
+    const histUnique=todoHist.filter((h,i,arr)=>
+      i===arr.findIndex(x=>x.data===h.data&&String(x.valor)===String(h.valor))
+    );
+    return{
+      ...c,
+      fiados:(fs||[]).filter(f=>f.cliente_id===c.id).map(f=>({
+        ...f,itens:typeof f.itens==='string'?JSON.parse(f.itens):f.itens
+      })),
+      pagamentos:histUnique
+    };
+  });
 }
 async function loadProdutos(){
   const uid=currentUser?.id;
@@ -827,33 +842,32 @@ function confirmarExcluirCliente(id){
 }
 
 // ── DETALHE ───────────────────────────────────────────────
-function renderHistorico(pagamentos){
+function renderHistorico(pagamentos,clienteId){
   if(!pagamentos||!pagamentos.length)return'';
   return`<div style="margin-top:20px">
     <div class="section-label">Histórico de compras pagas</div>
-    ${pagamentos.slice().reverse().map(p=>{
-      const itens=p.itens?(typeof p.itens==='string'?JSON.parse(p.itens):p.itens):[];
-      const dataISO=p.data_iso||'';
-      return`<div class="hist-card" id="histcard-${p.id}">
+    ${pagamentos.slice().reverse().map((p,i)=>{
+      const itens=p.itens?(typeof p.itens==='string'?JSON.parse(p.itens):(Array.isArray(p.itens)?p.itens:[])):[];
+      const idx=pagamentos.length-1-i; // índice real no array original
+      return`<div class="hist-card">
         <div class="hist-header">
           <div class="hist-badge">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div>
             <div style="font-size:13px;font-weight:600;color:#fff">✅ Pago</div>
-            <div style="font-size:11px;color:#555">📅 ${p.data}</div>
+            <div style="font-size:11px;color:#555">📅 ${p.data||'—'}</div>
           </div>
           <div class="hist-actions">
-            <button class="icon-btn" style="font-size:13px" data-edit-pag="${p.id}" data-pag-cliente="${p.cliente_id}">✏️</button>
-            <button class="icon-btn" style="font-size:13px" data-del-pag="${p.id}" data-pag-cliente="${p.cliente_id}">🗑️</button>
+            <button class="icon-btn" style="font-size:13px" data-del-hist="${idx}" data-hist-cid="${clienteId}">🗑️</button>
           </div>
         </div>
         ${itens.length?`<div class="hist-body">
-          ${itens.map(i=>`<div class="hist-item-row"><span>${i.nome}${i.qtd>1?' x'+i.qtd:''}</span><span style="color:#fff;font-weight:600">R$ ${(i.preco*(i.qtd||1)).toFixed(2)}</span></div>`).join('')}
+          ${itens.map(i=>`<div class="hist-item-row"><span>${i.nome||''}${(i.qtd||1)>1?' x'+(i.qtd):''}${i.data?' <span style="color:#555;font-size:11px">('+i.data+')</span>':''}</span><span style="color:#fff;font-weight:600">R$ ${(Number(i.preco||0)*Number(i.qtd||1)).toFixed(2)}</span></div>`).join('')}
         </div>`:''}
         <div class="hist-footer">
           <span style="font-size:12px;color:#888">Total pago</span>
-          <span style="font-size:14px;font-weight:800;color:var(--green)">R$ ${Number(p.valor).toFixed(2)}</span>
+          <span style="font-size:14px;font-weight:800;color:var(--green)">R$ ${Number(p.valor||0).toFixed(2)}</span>
         </div>
       </div>`;
     }).join('')}
@@ -908,17 +922,15 @@ function showDetalhe(id,voltarPara){
           </div>
         </div>`).join(''):'<div class="empty" style="padding:20px 0">Nenhuma compra em aberto</div>'}
     </div>
-    ${renderHistorico(c.pagamentos)}
+    ${renderHistorico(c.pagamentos, c.id)}
     </div>`;
   document.querySelector('[data-edit-det]')?.addEventListener('click',()=>abrirModalCliente(id));
   document.querySelector('[data-wpp]')?.addEventListener('click',()=>enviarWpp(id));
   document.querySelector('[data-zerar]')?.addEventListener('click',()=>zerarDivida(id));
-  // Editar/excluir fiados individuais
   document.querySelectorAll('[data-edit-fiado]').forEach(btn=>btn.addEventListener('click',()=>abrirEditFiado(btn.dataset.editFiado,btn.dataset.fiadoCid)));
   document.querySelectorAll('[data-del-fiado]').forEach(btn=>btn.addEventListener('click',()=>confirmarExcluirFiado(btn.dataset.delFiado,btn.dataset.fiadoCid)));
-  // Editar/excluir pagamentos
-  document.querySelectorAll('[data-edit-pag]').forEach(btn=>btn.addEventListener('click',()=>abrirEditPagamento(btn.dataset.editPag,btn.dataset.pagCliente)));
-  document.querySelectorAll('[data-del-pag]').forEach(btn=>btn.addEventListener('click',()=>confirmarExcluirPagamento(btn.dataset.delPag,btn.dataset.pagCliente)));
+  // Excluir registro do histórico por índice
+  document.querySelectorAll('[data-del-hist]').forEach(btn=>btn.addEventListener('click',()=>excluirHistoricoIdx(parseInt(btn.dataset.delHist),btn.dataset.histCid)));
   goTo('screen-cliente-detalhe');
 }
 
@@ -992,80 +1004,23 @@ function confirmarExcluirFiado(fiadoId,clienteId){
   openModal('modal-confirm');
 }
 
-// ── EDITAR / EXCLUIR PAGAMENTO ────────────────────────────
-let editPagId=null,editPagClienteId=null;
-
-function abrirEditPagamento(pagId,clienteId){
-  editPagId=pagId;editPagClienteId=clienteId;
+// ── EXCLUIR HISTÓRICO ─────────────────────────────────────
+function excluirHistoricoIdx(idx,clienteId){
   const c=clientes.find(c=>String(c.id)===String(clienteId));
-  const p=(c?.pagamentos||[]).find(p=>String(p.id)===String(pagId));
-  if(!p)return;
-  const itens=p.itens?(typeof p.itens==='string'?JSON.parse(p.itens):p.itens):[];
-  // Montar campos de itens editáveis
-  document.getElementById('edit-pag-itens-wrap').innerHTML=itens.length?`
-    <div style="font-size:12px;color:#555;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Itens</div>
-    ${itens.map((item,idx)=>`
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <input class="input-field" style="flex:2;margin-bottom:0" id="edit-item-nome-${idx}" value="${item.nome}" placeholder="Produto">
-        <input class="input-field" style="flex:1;margin-bottom:0" id="edit-item-qtd-${idx}" value="${item.qtd||1}" type="number" min="1" placeholder="Qtd">
-        <input class="input-field" style="flex:1;margin-bottom:0" id="edit-item-preco-${idx}" value="${item.preco}" type="number" step="0.01" min="0" placeholder="Preço">
-      </div>`).join('')}
-    <div style="font-size:11px;color:#555;margin-bottom:10px">${itens.length} item(s) — edite nome, quantidade ou preço</div>
-  `:'<div style="font-size:13px;color:#555;margin-bottom:12px">Nenhum item registrado neste pedido.</div>';
-  // Data ISO ou converter de dd/mm/aaaa
-  let dataISO=p.data_iso||'';
-  if(!dataISO&&p.data){
-    const parts=p.data.split('/');
-    if(parts.length===3)dataISO=`${parts[2]}-${parts[1]}-${parts[0]}`;
-  }
-  document.getElementById('edit-pag-data').value=dataISO;
-  openModal('modal-edit-pagamento');
-}
-
-async function salvarEdicaoPagamento(){
-  if(!editPagId)return;
-  const c=clientes.find(c=>String(c.id)===String(editPagClienteId));
-  const p=(c?.pagamentos||[]).find(p=>String(p.id)===String(editPagId));
-  if(!p)return;
-  const itensOrig=p.itens?(typeof p.itens==='string'?JSON.parse(p.itens):p.itens):[];
-  // Coleta itens editados
-  const novosItens=itensOrig.map((item,idx)=>{
-    const nome=document.getElementById(`edit-item-nome-${idx}`)?.value.trim()||item.nome;
-    const qtd=parseInt(document.getElementById(`edit-item-qtd-${idx}`)?.value)||item.qtd||1;
-    const preco=parseFloat(document.getElementById(`edit-item-preco-${idx}`)?.value)||item.preco;
-    return{...item,nome,qtd,preco};
-  });
-  const novoValor=novosItens.reduce((s,i)=>s+i.preco*(i.qtd||1),0)||Number(p.valor);
-  const dataISO=document.getElementById('edit-pag-data').value;
-  let dataDisplay=p.data;
-  if(dataISO){const[y,m,d]=dataISO.split('-');dataDisplay=`${d}/${m}/${y}`;}
-  const btn=document.getElementById('btn-salvar-pag');btn.disabled=true;btn.textContent='Salvando...';
-  showSaving();
-  const{error}=await sb.from('pagamentos').update({
-    data:dataDisplay,
-    data_iso:dataISO,
-    valor:novoValor,
-    itens:JSON.stringify(novosItens)
-  }).eq('id',editPagId);
-  btn.disabled=false;btn.textContent='✅ Salvar';
-  if(error){showToast('Erro ao salvar');return;}
-  closeModal('modal-edit-pagamento');
-  await loadClientes();
-  showToast('Pedido atualizado! ✅');
-  showDetalhe(editPagClienteId,voltarDetalhe);
-}
-
-function confirmarExcluirPagamento(pagId,clienteId){
-  const c=clientes.find(c=>String(c.id)===String(clienteId));
-  const p=(c?.pagamentos||[]).find(p=>String(p.id)===String(pagId));
-  document.getElementById('confirm-title').textContent='Excluir pedido';
-  document.getElementById('confirm-msg').textContent=`Deseja excluir este pedido de R$ ${Number(p?.valor||0).toFixed(2)}? Esta ação não pode ser desfeita.`;
+  if(!c)return;
+  const p=c.pagamentos[idx];
+  document.getElementById('confirm-title').textContent='Excluir registro';
+  document.getElementById('confirm-msg').textContent=`Excluir este registro de R$ ${Number(p?.valor||0).toFixed(2)} do dia ${p?.data||''}?`;
   document.getElementById('confirm-ok').onclick=async()=>{
     showSaving();
-    await sb.from('pagamentos').delete().eq('id',pagId);
+    const novoHist=[...c.pagamentos];
+    novoHist.splice(idx,1);
+    await sb.from('clientes').update({historico_pagamentos:novoHist}).eq('id',c.id);
+    // Também remove localStorage local
+    localStorage.setItem('pagologo_hist_'+c.id,JSON.stringify(novoHist.filter(h=>!h.id)));
     await loadClientes();
     closeModal('modal-confirm');
-    showToast('Pedido excluído');
+    showToast('Registro excluído');
     showDetalhe(clienteId,voltarDetalhe);
   };
   openModal('modal-confirm');
@@ -1153,7 +1108,6 @@ async function zerarDivida(id){
   showSaving();
   const cAntes=clientes.find(c=>String(c.id)===String(id));
   if(!cAntes){showToast('Cliente não encontrado');return;}
-  const clienteId=cAntes.id; // UUID real do Supabase
   const valor=getTotal(cAntes);
   const todosItens=[];
   (cAntes.fiados||[]).forEach(f=>{
@@ -1161,25 +1115,48 @@ async function zerarDivida(id){
   });
   const hoje=hojeCompleto();
   const hojeISO_=new Date().toISOString().split('T')[0];
-  // Tenta inserir com itens
-  let result=await sb.from('pagamentos').insert({
-    cliente_id:clienteId,valor,data:hoje,data_iso:hojeISO_,
-    itens:JSON.stringify(todosItens),user_id:currentUser?.id
-  });
-  if(result.error){
-    console.warn('Insert com itens falhou, tentando sem:',result.error.message);
-    result=await sb.from('pagamentos').insert({
-      cliente_id:clienteId,valor,data:hoje,user_id:currentUser?.id
+  const novoRegistro={valor,data:hoje,data_iso:hojeISO_,itens:todosItens};
+
+  // Estratégia: salvar histórico na tabela 'clientes' como campo json
+  // Pega histórico existente e adiciona o novo
+  const historicoAtual=cAntes.historico_pagamentos||[];
+  historicoAtual.push(novoRegistro);
+
+  const{error:errHist}=await sb.from('clientes').update({
+    historico_pagamentos: historicoAtual
+  }).eq('id',cAntes.id);
+
+  if(errHist){
+    // Coluna ainda não existe — tenta via tabela pagamentos com int
+    console.warn('historico_pagamentos falhou:',errHist.message,', tentando pagamentos com int...');
+    const clienteIdInt=parseInt(cAntes.id)||cAntes.id;
+    let r=await sb.from('pagamentos').insert({
+      cliente_id:clienteIdInt,valor,data:hoje,
+      data_iso:hojeISO_,itens:JSON.stringify(todosItens),
+      user_id:currentUser?.id
     });
+    if(r.error){
+      // Tenta sem colunas extras
+      r=await sb.from('pagamentos').insert({
+        cliente_id:clienteIdInt,valor,data:hoje,user_id:currentUser?.id
+      });
+    }
+    if(r.error){
+      // Salva localmente como fallback
+      console.error('Todos os métodos falharam:',r.error);
+      const localHist=JSON.parse(localStorage.getItem('pagologo_hist_'+cAntes.id)||'[]');
+      localHist.push(novoRegistro);
+      localStorage.setItem('pagologo_hist_'+cAntes.id,JSON.stringify(localHist));
+      showToast('Histórico salvo localmente ⚠️');
+    }
   }
-  if(result.error){showToast('Erro ao registrar: '+result.error.message);console.error(result.error);return;}
-  // Deleta os fiados usando o UUID real
-  await sb.from('fiados').delete().eq('cliente_id',clienteId);
+
+  await sb.from('fiados').delete().eq('cliente_id',cAntes.id);
   await loadClientes();
   const recebido=parseFloat(localStorage.getItem('pagologo_recebido')||'0');
   localStorage.setItem('pagologo_recebido',(recebido+valor).toFixed(2));
   showToast('Pagamento registrado! ✅');
-  showDetalhe(clienteId,voltarDetalhe);
+  showDetalhe(cAntes.id,voltarDetalhe);
 }
 
 // ── AUTH ──────────────────────────────────────────────────
