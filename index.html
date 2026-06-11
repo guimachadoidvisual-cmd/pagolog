@@ -458,18 +458,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
-<!-- MODAL EDITAR FIADO -->
-<div class="modal-overlay" id="modal-edit-fiado">
-  <div class="modal">
-    <div class="modal-title">Editar compra</div>
-    <div id="edit-fiado-itens-wrap"></div>
-    <div style="padding:10px 0 4px;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:.06em">Data da compra</div>
-    <input class="input-field" id="edit-fiado-data" type="date">
-    <button class="btn-main" id="btn-salvar-fiado" onclick="salvarEdicaoFiado()">✅ Salvar</button>
-    <button class="btn-sec" onclick="closeModal('modal-edit-fiado')">Cancelar</button>
-  </div>
-</div>
-
 <!-- MODAL EDITAR PAGAMENTO -->
 <div class="modal-overlay" id="modal-edit-pagamento">
   <div class="modal">
@@ -505,6 +493,7 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let clientes=[],produtos=[],msgTemplate=`Ola, {{nome}}!\n\nSegue o resumo do seu fiado:\n\n{{resumo}}\n\n*Total: {{total}}*\n\nQuando puder, me faz o pix!`;
 let vendaClienteId=null,vendaCarrinho={},editClienteId=null,voltarDetalhe='screen-home';
 let currentUser=null,userName='';
+let modoEdicaoFiado=false,editFiadoIdAtual=null,editFiadoDataAtual=null;
 
 const TAGS=[
   {id:'{{nome}}',label:'Primeiro nome'},{id:'{{nome_completo}}',label:'Nome completo'},
@@ -572,6 +561,10 @@ function goTo(id){
   if(id==='screen-mensagem')initMensagem();
   if(id==='screen-vender-s1'){
     vendaClienteId=null;vendaCarrinho={};
+    modoEdicaoFiado=false;editFiadoIdAtual=null;editFiadoDataAtual=null;
+    // Restaura botão voltar do S2
+    const btnBackS2=document.querySelector('#screen-vender-s2 .btn-back');
+    if(btnBackS2)btnBackS2.onclick=()=>goTo('screen-vender-s1');
     if(document.getElementById('busca-cliente'))document.getElementById('busca-cliente').value='';
     renderClientesList('');
     setActiveNav(null);
@@ -580,11 +573,13 @@ function goTo(id){
     if(document.getElementById('busca-produto'))document.getElementById('busca-produto').value='';
     renderProdutosVenda('');
     const c=clientes.find(c=>c.id===vendaClienteId);
-    document.getElementById('hint-s2').textContent='Para '+(c?c.nome:'');
+    document.getElementById('hint-s2').textContent=(modoEdicaoFiado?'Editando pedido de ':'Para ')+(c?c.nome:'');
+    // Título e botão confirmar
+    document.querySelector('#screen-vender-s3 .btn-main').textContent=modoEdicaoFiado?'✅ Salvar edição':'✅ Confirmar fiado';
   }
   if(id==='screen-vender-s3'){
     renderResumo();
-    document.getElementById('venda-data').value=hojeISO();
+    document.getElementById('venda-data').value=modoEdicaoFiado&&editFiadoDataAtual?editFiadoDataAtual:hojeISO();
   }
 }
 
@@ -717,7 +712,7 @@ function renderResumo(){
 
 async function confirmarVenda(){
   const c=clientes.find(c=>String(c.id)===String(vendaClienteId));
-  if(!c){showToast('Erro: cliente não encontrado');console.error('vendaClienteId=',vendaClienteId,'clientes=',clientes.map(x=>x.id));return;}
+  if(!c){showToast('Erro: cliente não encontrado');return;}
   const dataISO=document.getElementById('venda-data').value;
   const dataDisplay=dataISO?isoToDisplay(dataISO):hojeStr();
   const itens=Object.entries(vendaCarrinho).filter(([,q])=>q>0).map(([id,q])=>{
@@ -728,12 +723,26 @@ async function confirmarVenda(){
   const btnConfirmar=document.querySelector('#screen-vender-s3 .btn-main');
   if(btnConfirmar){btnConfirmar.disabled=true;btnConfirmar.textContent='Salvando...';}
   showSaving();
-  const{error}=await sb.from('fiados').insert({cliente_id:c.id,data:dataDisplay,itens:JSON.stringify(itens)});
-  if(btnConfirmar){btnConfirmar.disabled=false;btnConfirmar.textContent='✅ Confirmar fiado';}
-  if(error){showToast('Erro ao salvar: '+error.message);console.error(error);return;}
-  await loadClientes();
-  showToast('Fiado registrado para '+c.nome+'!');
-  goTo('screen-home');
+  let error;
+  if(modoEdicaoFiado&&editFiadoIdAtual){
+    // MODO EDIÇÃO: atualiza o fiado existente
+    ({error}=await sb.from('fiados').update({data:dataDisplay,itens:JSON.stringify(itens)}).eq('id',editFiadoIdAtual));
+    if(btnConfirmar){btnConfirmar.disabled=false;btnConfirmar.textContent='✅ Salvar edição';}
+    if(error){showToast('Erro ao salvar: '+error.message);return;}
+    await loadClientes();
+    showToast('Pedido atualizado! ✅');
+    // Limpa modo edição
+    modoEdicaoFiado=false;editFiadoIdAtual=null;editFiadoDataAtual=null;
+    showDetalhe(c.id,voltarDetalhe);
+  } else {
+    // MODO NORMAL: insere novo fiado
+    ({error}=await sb.from('fiados').insert({cliente_id:c.id,data:dataDisplay,itens:JSON.stringify(itens)}));
+    if(btnConfirmar){btnConfirmar.disabled=false;btnConfirmar.textContent='✅ Confirmar fiado';}
+    if(error){showToast('Erro ao salvar: '+error.message);return;}
+    await loadClientes();
+    showToast('Fiado registrado para '+c.nome+'!');
+    goTo('screen-home');
+  }
 }
 
 // ── CLIENTES ──────────────────────────────────────────────
@@ -915,55 +924,53 @@ function showDetalhe(id,voltarPara){
 let editFiadoId=null,editFiadoClienteId=null;
 
 function abrirEditFiado(fiadoId,clienteId){
-  editFiadoId=fiadoId;editFiadoClienteId=clienteId;
   const c=clientes.find(c=>String(c.id)===String(clienteId));
   const f=(c?.fiados||[]).find(f=>String(f.id)===String(fiadoId));
-  if(!f)return;
-  const itens=f.itens||[];
-  document.getElementById('edit-fiado-itens-wrap').innerHTML=`
-    <div style="font-size:12px;color:#555;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Itens</div>
-    ${itens.map((item,idx)=>`
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <input class="input-field" style="flex:2;margin-bottom:0" id="ef-nome-${idx}" value="${item.nome}" placeholder="Produto">
-        <input class="input-field" style="flex:1;margin-bottom:0" id="ef-qtd-${idx}" value="${item.qtd||1}" type="number" min="1" placeholder="Qtd">
-        <input class="input-field" style="flex:1;margin-bottom:0" id="ef-preco-${idx}" value="${item.preco}" type="number" step="0.01" min="0" placeholder="Preço">
-      </div>`).join('')}
-    <div style="font-size:11px;color:#555;margin-bottom:8px">${itens.length} item(s)</div>`;
-  // Converter data dd/mm para ISO
-  let dataISO='';
+  if(!f||!c)return;
+  // Configura modo edição
+  modoEdicaoFiado=true;
+  editFiadoIdAtual=fiadoId;
+  editFiadoDataAtual=f.data;
+  vendaClienteId=String(clienteId);
+  // Pré-preenche carrinho com itens do fiado
+  vendaCarrinho={};
+  (f.itens||[]).forEach(item=>{
+    // Tenta achar o produto pelo nome para obter o id
+    const prod=produtos.find(p=>p.nome.trim().toLowerCase()===item.nome.trim().toLowerCase());
+    if(prod){vendaCarrinho[String(prod.id)]=item.qtd||1;}
+  });
+  // Converte data dd/mm ou dd/mm/aaaa para ISO
+  let dataISO=hojeISO();
   if(f.data){
     const parts=f.data.split('/');
     if(parts.length===3)dataISO=`${parts[2]}-${parts[1]}-${parts[0]}`;
-    else if(parts.length===2){const y=new Date().getFullYear();dataISO=`${y}-${parts[1]}-${parts[0]}`;}
+    else if(parts.length===2){dataISO=`${new Date().getFullYear()}-${parts[1]}-${parts[0]}`;}
   }
-  document.getElementById('edit-fiado-data').value=dataISO;
-  openModal('modal-edit-fiado');
-}
-
-async function salvarEdicaoFiado(){
-  if(!editFiadoId)return;
-  const c=clientes.find(c=>String(c.id)===String(editFiadoClienteId));
-  const f=(c?.fiados||[]).find(f=>String(f.id)===String(editFiadoId));
-  if(!f)return;
-  const itensOrig=f.itens||[];
-  const novosItens=itensOrig.map((item,idx)=>{
-    const nome=document.getElementById(`ef-nome-${idx}`)?.value.trim()||item.nome;
-    const qtd=parseInt(document.getElementById(`ef-qtd-${idx}`)?.value)||item.qtd||1;
-    const preco=parseFloat(document.getElementById(`ef-preco-${idx}`)?.value)||item.preco;
-    return{...item,nome,qtd,preco};
-  });
-  const dataISO=document.getElementById('edit-fiado-data').value;
-  let dataDisplay=f.data;
-  if(dataISO){const[y,m,d]=dataISO.split('-');dataDisplay=`${d}/${m}`;}
-  const btn=document.getElementById('btn-salvar-fiado');btn.disabled=true;btn.textContent='Salvando...';
-  showSaving();
-  const{error}=await sb.from('fiados').update({data:dataDisplay,itens:JSON.stringify(novosItens)}).eq('id',editFiadoId);
-  btn.disabled=false;btn.textContent='✅ Salvar';
-  if(error){showToast('Erro ao salvar');return;}
-  closeModal('modal-edit-fiado');
-  await loadClientes();
-  showToast('Compra atualizada! ✅');
-  showDetalhe(editFiadoClienteId,voltarDetalhe);
+  editFiadoDataAtual=dataISO;
+  // Vai direto para S2 (produtos)
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-vender-s2').classList.add('active');
+  window.scrollTo(0,0);
+  if(document.getElementById('busca-produto'))document.getElementById('busca-produto').value='';
+  renderProdutosVenda('');
+  document.getElementById('hint-s2').textContent='Editando pedido de '+c.nome;
+  document.querySelector('#screen-vender-s3 .btn-main').textContent='✅ Salvar edição';
+  // Botão voltar do S2 vai para o detalhe
+  document.querySelector('#screen-vender-s2 .btn-back').onclick=()=>{
+    modoEdicaoFiado=false;editFiadoIdAtual=null;
+    document.querySelector('#screen-vender-s2 .btn-back').onclick=()=>goTo('screen-vender-s1');
+    showDetalhe(clienteId,voltarDetalhe);
+  };
+  // FAB
+  const fabV=document.getElementById('fab-vender');
+  const fabF=document.getElementById('fab-finalizar');
+  if(fabV)fabV.classList.add('hidden');
+  if(fabF){fabF.classList.add('show');}
+  // Pré-preenche a data na tela de resumo
+  setTimeout(()=>{
+    const inp=document.getElementById('venda-data');
+    if(inp)inp.value=editFiadoDataAtual;
+  },50);
 }
 
 function confirmarExcluirFiado(fiadoId,clienteId){
@@ -1144,20 +1151,24 @@ async function zerarDivida(id){
   showSaving();
   const cAntes=clientes.find(c=>String(c.id)===String(id));
   const valor=getTotal(cAntes);
-  // Coleta todos os itens de todos os fiados
   const todosItens=[];
   (cAntes.fiados||[]).forEach(f=>{
     (f.itens||[]).forEach(i=>todosItens.push({...i,data:f.data}));
   });
-  // Grava pagamento com itens no histórico
-  await sb.from('pagamentos').insert({
-    cliente_id:id,
-    valor:valor,
-    data:hojeCompleto(),
-    data_iso:new Date().toISOString().split('T')[0],
-    itens:JSON.stringify(todosItens),
-    user_id:currentUser?.id
+  const hoje=hojeCompleto();
+  const hojeISO_=new Date().toISOString().split('T')[0];
+  // Tenta inserir com itens; se falhar tenta sem (colunas podem não existir ainda)
+  let result=await sb.from('pagamentos').insert({
+    cliente_id:id,valor,data:hoje,data_iso:hojeISO_,
+    itens:JSON.stringify(todosItens),user_id:currentUser?.id
   });
+  if(result.error){
+    console.warn('Insert completo falhou, tentando sem itens/data_iso:',result.error.message);
+    result=await sb.from('pagamentos').insert({
+      cliente_id:id,valor,data:hoje,user_id:currentUser?.id
+    });
+  }
+  if(result.error){showToast('Erro ao registrar: '+result.error.message);console.error(result.error);return;}
   await sb.from('fiados').delete().eq('cliente_id',id);
   await loadClientes();
   const recebido=parseFloat(localStorage.getItem('pagologo_recebido')||'0');
