@@ -132,6 +132,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .summary-total{display:flex;justify-content:space-between;padding:13px 0 0;font-size:17px;font-weight:700;color:#fff}
 .info-block{margin-top:8px;padding:11px;background:#1a1a1a;border-radius:10px;font-size:13px;color:#888;border:1px solid #2a2a2a}
 
+/* IMPORT CONTATOS */
+.import-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.import-card input[type="checkbox"]{width:20px;height:20px;accent-color:var(--green);flex-shrink:0;cursor:pointer}
+
 /* MODAIS */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:flex-end}
 .modal-overlay.open{display:flex}
@@ -410,6 +414,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       Clientes
     </button>
     <button class="btn-sec" onclick="abrirModalCliente(null)">+ Cadastrar cliente</button>
+    <button class="btn-sec" id="btn-importar-contatos" onclick="importarContatos()">📱 Importar contatos do telefone</button>
     <div id="lista-clientes"></div>
   </div>
 
@@ -500,6 +505,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <input class="input-field" id="novo-prod-preco" placeholder="Preço (ex: 5.50)" type="number" step="0.01" min="0">
     <button class="btn-main" id="btn-salvar-produto" onclick="addProduto()">✅ Salvar</button>
     <button class="btn-sec" onclick="closeModal('modal-add-produto')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL IMPORTAR CONTATOS -->
+<div class="modal-overlay" id="modal-import-contatos">
+  <div class="modal">
+    <div class="modal-title">Importar contatos</div>
+    <div id="import-count" style="font-size:13px;color:#888;margin-bottom:12px"></div>
+    <div id="lista-import-contatos" style="max-height:50vh;overflow-y:auto;margin-bottom:12px"></div>
+    <button class="btn-main" onclick="confirmarImportContatos()">✅ Importar selecionados</button>
+    <button class="btn-sec" onclick="closeModal('modal-import-contatos')">Cancelar</button>
   </div>
 </div>
 
@@ -630,6 +646,11 @@ async function init(){
   try{
     await Promise.all([loadClientes(),loadProdutos(),loadMensagem(),loadNome()]);
   }catch(e){showToast('Erro ao carregar dados');console.error(e)}
+  // Esconde botão de importar contatos se não suportado (iOS/Safari)
+  if(!('contacts' in navigator && 'ContactsManager' in window)){
+    const btnImport=document.getElementById('btn-importar-contatos');
+    if(btnImport)btnImport.style.display='none';
+  }
   document.getElementById('loading-screen').style.display='none';
   document.getElementById('home-username').textContent=userName?'Olá, '+userName+'! 👋':'Olá! 👋';
   renderHome();
@@ -1160,6 +1181,78 @@ async function zerarDivida(id){
   localStorage.setItem('pagologo_recebido',(recebido+valor).toFixed(2));
   showToast('✅ Marcado como pago!');
   showDetalhe(cAntes.id,voltarDetalhe);
+}
+
+// ── IMPORTAR CONTATOS ─────────────────────────────────────
+let importContatosLista=[];
+
+async function importarContatos(){
+  if(!('contacts' in navigator && 'ContactsManager' in window)){
+    showToast('📱 Disponível apenas no Android (Chrome)');
+    return;
+  }
+  try{
+    const props=['name','tel'];
+    const opts={multiple:true};
+    const contatos=await navigator.contacts.select(props,opts);
+    if(!contatos.length)return;
+
+    importContatosLista=contatos.map((c,idx)=>{
+      const nome=(c.name&&c.name[0])?c.name[0]:'Sem nome';
+      let tel='';
+      if(c.tel&&c.tel[0]){
+        tel=c.tel[0].replace(/\D/g,'');
+        if(tel.length>11)tel=tel.slice(-11);
+      }
+      return{id:idx,nome,tel,checked:!!tel};
+    }).filter(c=>c.tel);
+
+    if(!importContatosLista.length){
+      showToast('Nenhum contato com telefone válido encontrado');
+      return;
+    }
+
+    renderImportContatos();
+    openModal('modal-import-contatos');
+  }catch(e){
+    console.error(e);
+    showToast('Importação cancelada ou erro ao acessar contatos');
+  }
+}
+
+function renderImportContatos(){
+  document.getElementById('import-count').textContent=`${importContatosLista.length} contato(s) encontrado(s) — desmarque os que não quiser importar`;
+  const el=document.getElementById('lista-import-contatos');
+  el.innerHTML=importContatosLista.map(c=>`
+    <label class="import-card">
+      <input type="checkbox" data-imp="${c.id}" ${c.checked?'checked':''}>
+      <div class="card-info">
+        <div class="card-name">${c.nome}</div>
+        <div class="card-sub">${c.tel}</div>
+      </div>
+    </label>`).join('');
+  el.querySelectorAll('[data-imp]').forEach(chk=>{
+    chk.addEventListener('change',()=>{
+      const item=importContatosLista.find(c=>String(c.id)===chk.dataset.imp);
+      if(item)item.checked=chk.checked;
+    });
+  });
+}
+
+async function confirmarImportContatos(){
+  const selecionados=importContatosLista.filter(c=>c.checked);
+  if(!selecionados.length){showToast('Nenhum contato selecionado');return;}
+  const btn=document.querySelector('#modal-import-contatos .btn-main');
+  btn.disabled=true;btn.textContent='Importando...';
+  showSaving();
+  const rows=selecionados.map(c=>({nome:c.nome,tel:c.tel,user_id:currentUser?.id}));
+  const{error}=await sb.from('clientes').insert(rows);
+  btn.disabled=false;btn.textContent='✅ Importar selecionados';
+  if(error){showToast('Erro: '+error.message);return;}
+  await loadClientes();
+  closeModal('modal-import-contatos');
+  renderClientes();
+  showToast(`${selecionados.length} cliente(s) importado(s)! 🎉`);
 }
 
 // ── AUTH ──────────────────────────────────────────────────
