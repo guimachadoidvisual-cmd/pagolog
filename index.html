@@ -1206,7 +1206,7 @@ async function esqueceuSenha(){
   const email=document.getElementById('auth-email').value.trim();
   if(!email){showAuthError('Digite seu e-mail primeiro');return}
   const{error}=await sb.auth.resetPasswordForEmail(email,{
-    redirectTo:'https://guimachadoidvisual-cmd.github.io'
+    redirectTo:'http://app.pagologo.com.br/'
   });
   if(error){showAuthError('Erro: '+error.message);return}
   showAuthError('✅ Link de redefinição enviado para seu e-mail!');
