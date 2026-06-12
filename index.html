@@ -173,21 +173,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .saving-indicator.show{opacity:1}
 .empty{text-align:center;padding:40px 20px;color:#555;font-size:14px}
 
-/* PAYWALL */
-.paywall-screen{display:none;position:fixed;inset:0;background:#111;z-index:9997;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
-.paywall-screen.active{display:flex}
-.paywall-logo{margin-bottom:28px}
-.paywall-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.2}
-.paywall-sub{font-size:15px;color:#555;margin-bottom:32px;line-height:1.6}
-.paywall-box{background:#1a1a1a;border:1.5px solid rgba(34,197,94,.3);border-radius:22px;padding:24px;width:100%;max-width:360px;margin-bottom:20px;box-shadow:0 0 40px rgba(34,197,94,.08)}
-.paywall-price{font-size:42px;font-weight:900;color:#fff;margin-bottom:4px}
-.paywall-price span{font-size:16px;font-weight:400;color:#555}
-.paywall-features{margin:16px 0;display:flex;flex-direction:column;gap:10px}
-.paywall-feat{display:flex;align-items:center;gap:10px;font-size:13px;color:#aaa;text-align:left}
-.paywall-dot{width:20px;height:20px;border-radius:50%;background:rgba(34,197,94,.15);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.paywall-already{font-size:13px;color:#555;margin-top:12px}
-.paywall-already button{background:none;border:none;color:var(--green);font-size:13px;cursor:pointer;text-decoration:underline}
-
 /* HISTÓRICO */
 .hist-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;margin-bottom:10px;overflow:hidden}
 .hist-header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #222}
@@ -201,6 +186,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </style>
 </head>
 <body>
+
+<!-- SETUP BANNER -->
+<div id="setup-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9990;background:#1a1a1a;border-bottom:2px solid #f59e0b;padding:16px 20px">
+  <div style="font-size:13px;font-weight:700;color:#f59e0b;margin-bottom:8px">⚠️ Configure o banco de dados</div>
+  <div style="font-size:12px;color:#aaa;margin-bottom:10px">Execute este SQL no <b>Supabase → SQL Editor</b> para ativar o histórico:</div>
+  <div style="background:#111;border-radius:8px;padding:10px;font-size:11px;font-family:monospace;color:#22c55e;word-break:break-all;margin-bottom:10px">ALTER TABLE fiados ADD COLUMN IF NOT EXISTS pago boolean DEFAULT false;<br>ALTER TABLE fiados ADD COLUMN IF NOT EXISTS data_pago text;</div>
+  <button onclick="document.getElementById('setup-banner').style.display='none'" style="background:#f59e0b;color:#000;border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer">Entendi, já executei ✓</button>
+</div>
 
 <!-- LOADING -->
 <div class="loading-screen" id="loading-screen">
@@ -216,7 +209,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <!-- Seta verde -->
   <polygon points="80,18 64,18 74,30" fill="#22c55e"/>
   <!-- Texto Pago -->
-  <text x="108" y="82" font-family="-apple-system,BMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="white">Pago</text>
+  <text x="108" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="white">Pago</text>
   <!-- Texto Logo verde -->
   <text x="250" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="#22c55e">Logo</text>
 </svg>
@@ -244,9 +237,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <text x="250" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="#22c55e">Logo</text>
 </svg>
     </div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Entrar</button>
-      <button class="auth-tab" id="tab-cadastro" onclick="switchTab('cadastro')">Cadastrar</button>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">Bem-vindo de volta!</div>
+      <div style="font-size:13px;color:#555">Entre com seu e-mail e senha</div>
     </div>
     <div class="auth-error" id="auth-error"></div>
     <input class="input-field" id="auth-email" type="email" placeholder="Seu e-mail" autocomplete="email">
@@ -256,51 +249,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <svg id="eye-senha-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
     </div>
-    <div class="input-password-wrap cadastro-only" id="wrap-confirmar-senha">
-      <input class="input-field" id="auth-senha-confirm" type="password" placeholder="Repetir senha" autocomplete="new-password">
-      <button class="eye-btn" type="button" onclick="toggleSenha('auth-senha-confirm','eye-confirm')" id="eye-confirm">
-        <svg id="eye-confirm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
-    </div>
     <button class="btn-main" id="btn-auth" onclick="fazerAuth()">Entrar</button>
     <div style="text-align:center" id="wrap-esqueci">
       <button onclick="esqueceuSenha()" style="background:none;border:none;color:#555;font-size:13px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button>
     </div>
-  </div>
-</div>
-
-<!-- PAYWALL -->
-<div class="paywall-screen" id="paywall-screen">
-  <div class="paywall-logo">
-    <svg width="200" height="56" viewBox="0 0 420 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="4" width="90" height="112" rx="18" stroke="white" stroke-width="8" fill="none"/>
-      <rect x="18" y="72" width="14" height="32" rx="3" fill="white"/>
-      <rect x="38" y="56" width="14" height="48" rx="3" fill="white"/>
-      <rect x="58" y="40" width="14" height="64" rx="3" fill="white"/>
-      <polyline points="18,68 38,52 55,60 80,18" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <polygon points="80,18 64,18 74,30" fill="#22c55e"/>
-      <text x="108" y="82" font-family="-apple-system,sans-serif" font-size="58" font-weight="800" fill="white">Pago</text>
-      <text x="250" y="82" font-family="-apple-system,sans-serif" font-size="58" font-weight="800" fill="#22c55e">Logo</text>
-    </svg>
-  </div>
-  <div class="paywall-title">Acesso exclusivo<br>para assinantes</div>
-  <div class="paywall-sub">Assine o PagoLogo e controle<br>seus fiados sem papel.</div>
-  <div class="paywall-box">
-    <div class="paywall-price">R$ 9,90<span>/mês</span></div>
-    <div style="font-size:12px;color:#555;margin-bottom:4px">Cancele quando quiser</div>
-    <div class="paywall-features">
-      <div class="paywall-feat"><div class="paywall-dot"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Clientes e produtos ilimitados</div>
-      <div class="paywall-feat"><div class="paywall-dot"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Envio de cobrança via WhatsApp</div>
-      <div class="paywall-feat"><div class="paywall-dot"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Histórico completo de pagamentos</div>
-      <div class="paywall-feat"><div class="paywall-dot"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Funciona no celular e no PC</div>
-    </div>
-    <button class="btn-main" style="margin-bottom:0" onclick="abrirKiwify()">Assinar agora →</button>
-  </div>
-  <div class="paywall-already">
-    Já assinou? <button onclick="verificarAssinatura()">Verificar acesso</button>
-  </div>
-  <div style="margin-top:16px">
-    <button onclick="sairPaywall()" style="background:none;border:none;color:#333;font-size:12px;cursor:pointer">Sair da conta</button>
   </div>
 </div>
 
@@ -531,8 +483,6 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let clientes=[],produtos=[],msgTemplate=`Ola, {{nome}}!\n\nSegue o resumo do seu fiado:\n\n{{resumo}}\n\n*Total: {{total}}*\n\nQuando puder, me faz o pix!`;
 let vendaClienteId=null,vendaCarrinho={},editClienteId=null,voltarDetalhe='screen-home';
 let currentUser=null,userName='';
-let isPro=false;
-const KIWIFY_URL='https://pay.kiwify.com.br/Eq7IUMT';
 let modoEdicaoFiado=false,editFiadoIdAtual=null,editFiadoDataAtual=null;
 
 const TAGS=[
@@ -623,7 +573,15 @@ function goTo(id){
   }
 }
 
-// ── INIT ──────────────────────────────────────────────────
+// ── SETUP CHECK ───────────────────────────────────────────
+async function checkSetup(){
+  // Testa se a coluna 'pago' existe na tabela fiados
+  const{error}=await sb.from('fiados').select('pago').limit(1);
+  if(error&&error.message.includes('pago')){
+    // Mostra banner com SQL
+    document.getElementById('setup-banner').style.display='block';
+  }
+}
 async function init(){
   try{
     await Promise.all([loadClientes(),loadProdutos(),loadMensagem(),loadNome()]);
@@ -631,6 +589,7 @@ async function init(){
   document.getElementById('loading-screen').style.display='none';
   document.getElementById('home-username').textContent=userName?'Olá, '+userName+'! 👋':'Olá! 👋';
   renderHome();
+  checkSetup();
 }
 
 // ── LOAD ──────────────────────────────────────────────────
@@ -641,37 +600,16 @@ async function loadClientes(){
   if(ce)throw ce;
   const{data:fs,error:fe}=await sb.from('fiados').select('*').order('created_at');
   if(fe)throw fe;
-  // Tenta carregar da tabela pagamentos (pode falhar por tipo incompatível)
-  let ps=[];
-  try{
-    const{data:psData}=await sb.from('pagamentos').select('*').eq('user_id',uid).order('created_at');
-    ps=psData||[];
-  }catch(e){ps=[];}
 
   clientes=(cs||[]).map(c=>{
-    // Histórico salvo na coluna historico_pagamentos da tabela clientes
-    let histCliente=[];
-    if(c.historico_pagamentos){
-      histCliente=Array.isArray(c.historico_pagamentos)?c.historico_pagamentos:[];
-    }
-    // Histórico salvo localmente (fallback)
-    const histLocal=JSON.parse(localStorage.getItem('pagologo_hist_'+c.id)||'[]');
-    // Histórico da tabela pagamentos
-    const histPag=ps.filter(p=>String(p.cliente_id)===String(c.id)).map(p=>({
-      ...p,
-      itens:p.itens?(typeof p.itens==='string'?JSON.parse(p.itens):p.itens):[]
+    const todos=(fs||[]).filter(f=>f.cliente_id===c.id).map(f=>({
+      ...f,
+      itens:typeof f.itens==='string'?JSON.parse(f.itens||'[]'):(f.itens||[])
     }));
-    // Mescla todos, evitando duplicatas por data+valor
-    const todoHist=[...histCliente,...histLocal,...histPag];
-    const histUnique=todoHist.filter((h,i,arr)=>
-      i===arr.findIndex(x=>x.data===h.data&&String(x.valor)===String(h.valor))
-    );
     return{
       ...c,
-      fiados:(fs||[]).filter(f=>f.cliente_id===c.id).map(f=>({
-        ...f,itens:typeof f.itens==='string'?JSON.parse(f.itens):f.itens
-      })),
-      pagamentos:histUnique
+      fiados:todos.filter(f=>!f.pago),
+      pagamentos:todos.filter(f=>f.pago)
     };
   });
 }
@@ -897,29 +835,34 @@ function confirmarExcluirCliente(id){
 function renderHistorico(pagamentos,clienteId){
   if(!pagamentos||!pagamentos.length)return'';
   return`<div style="margin-top:20px">
-    <div class="section-label">Histórico de compras pagas</div>
+    <div class="section-label">Compras finalizadas</div>
     ${pagamentos.slice().reverse().map((p,i)=>{
-      const itens=p.itens?(typeof p.itens==='string'?JSON.parse(p.itens):(Array.isArray(p.itens)?p.itens:[])):[];
-      const idx=pagamentos.length-1-i; // índice real no array original
+      const itens=p.itens||[];
+      const valor=itens.reduce((s,i)=>s+Number(i.preco||0)*Number(i.qtd||1),0);
+      const idx=pagamentos.length-1-i;
+      const dataPago=p.data_pago?`✅ Pago em ${p.data_pago}`:'✅ Pago';
       return`<div class="hist-card">
         <div class="hist-header">
           <div class="hist-badge">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#fff">✅ Pago</div>
-            <div style="font-size:11px;color:#555">📅 ${p.data||'—'}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:#22c55e">${dataPago}</div>
+            <div style="font-size:11px;color:#555">📅 Pedido de ${p.data||'—'}</div>
           </div>
           <div class="hist-actions">
             <button class="icon-btn" style="font-size:13px" data-del-hist="${idx}" data-hist-cid="${clienteId}">🗑️</button>
           </div>
         </div>
         ${itens.length?`<div class="hist-body">
-          ${itens.map(i=>`<div class="hist-item-row"><span>${i.nome||''}${(i.qtd||1)>1?' x'+(i.qtd):''}${i.data?' <span style="color:#555;font-size:11px">('+i.data+')</span>':''}</span><span style="color:#fff;font-weight:600">R$ ${(Number(i.preco||0)*Number(i.qtd||1)).toFixed(2)}</span></div>`).join('')}
+          ${itens.map(i=>`<div class="hist-item-row">
+            <span>${i.nome||''}${Number(i.qtd||1)>1?' x'+i.qtd:''}</span>
+            <span style="color:#fff;font-weight:600">R$ ${(Number(i.preco||0)*Number(i.qtd||1)).toFixed(2)}</span>
+          </div>`).join('')}
         </div>`:''}
         <div class="hist-footer">
           <span style="font-size:12px;color:#888">Total pago</span>
-          <span style="font-size:14px;font-weight:800;color:var(--green)">R$ ${Number(p.valor||0).toFixed(2)}</span>
+          <span style="font-size:14px;font-weight:800;color:var(--green)">R$ ${valor.toFixed(2)}</span>
         </div>
       </div>`;
     }).join('')}
@@ -1061,15 +1004,12 @@ function excluirHistoricoIdx(idx,clienteId){
   const c=clientes.find(c=>String(c.id)===String(clienteId));
   if(!c)return;
   const p=c.pagamentos[idx];
+  if(!p)return;
   document.getElementById('confirm-title').textContent='Excluir registro';
-  document.getElementById('confirm-msg').textContent=`Excluir este registro de R$ ${Number(p?.valor||0).toFixed(2)} do dia ${p?.data||''}?`;
+  document.getElementById('confirm-msg').textContent=`Excluir este registro de R$ ${Number(p.valor||0).toFixed(2)} do dia ${p.data_pago||p.data||''}?`;
   document.getElementById('confirm-ok').onclick=async()=>{
     showSaving();
-    const novoHist=[...c.pagamentos];
-    novoHist.splice(idx,1);
-    await sb.from('clientes').update({historico_pagamentos:novoHist}).eq('id',c.id);
-    // Também remove localStorage local
-    localStorage.setItem('pagologo_hist_'+c.id,JSON.stringify(novoHist.filter(h=>!h.id)));
+    await sb.from('fiados').delete().eq('id',p.id);
     await loadClientes();
     closeModal('modal-confirm');
     showToast('Registro excluído');
@@ -1159,78 +1099,26 @@ function enviarWpp(id){
 async function zerarDivida(id){
   showSaving();
   const cAntes=clientes.find(c=>String(c.id)===String(id));
-  if(!cAntes){showToast('Cliente não encontrado');return;}
+  if(!cAntes||!cAntes.fiados.length){showToast('Nenhuma compra em aberto');return;}
   const valor=getTotal(cAntes);
-  const todosItens=[];
-  (cAntes.fiados||[]).forEach(f=>{
-    (f.itens||[]).forEach(i=>todosItens.push({...i,data:f.data}));
-  });
   const hoje=hojeCompleto();
-  const hojeISO_=new Date().toISOString().split('T')[0];
-  const novoRegistro={valor,data:hoje,data_iso:hojeISO_,itens:todosItens};
-
-  // Estratégia: salvar histórico na tabela 'clientes' como campo json
-  // Pega histórico existente e adiciona o novo
-  const historicoAtual=cAntes.historico_pagamentos||[];
-  historicoAtual.push(novoRegistro);
-
-  const{error:errHist}=await sb.from('clientes').update({
-    historico_pagamentos: historicoAtual
-  }).eq('id',cAntes.id);
-
-  if(errHist){
-    // Coluna ainda não existe — tenta via tabela pagamentos com int
-    console.warn('historico_pagamentos falhou:',errHist.message,', tentando pagamentos com int...');
-    const clienteIdInt=parseInt(cAntes.id)||cAntes.id;
-    let r=await sb.from('pagamentos').insert({
-      cliente_id:clienteIdInt,valor,data:hoje,
-      data_iso:hojeISO_,itens:JSON.stringify(todosItens),
-      user_id:currentUser?.id
-    });
-    if(r.error){
-      // Tenta sem colunas extras
-      r=await sb.from('pagamentos').insert({
-        cliente_id:clienteIdInt,valor,data:hoje,user_id:currentUser?.id
-      });
-    }
-    if(r.error){
-      // Salva localmente como fallback
-      console.error('Todos os métodos falharam:',r.error);
-      const localHist=JSON.parse(localStorage.getItem('pagologo_hist_'+cAntes.id)||'[]');
-      localHist.push(novoRegistro);
-      localStorage.setItem('pagologo_hist_'+cAntes.id,JSON.stringify(localHist));
-      showToast('Histórico salvo localmente ⚠️');
-    }
+  // Marca todos os fiados em aberto como pago=true
+  const ids=cAntes.fiados.map(f=>f.id);
+  const{error}=await sb.from('fiados').update({pago:true,data_pago:hoje}).in('id',ids);
+  if(error){
+    // Se coluna pago não existir ainda, tenta criar via RPC ou avisa
+    showToast('Erro: adicione a coluna "pago" (boolean) na tabela fiados no Supabase');
+    console.error('Erro ao marcar pago:',error.message);
+    return;
   }
-
-  await sb.from('fiados').delete().eq('cliente_id',cAntes.id);
   await loadClientes();
   const recebido=parseFloat(localStorage.getItem('pagologo_recebido')||'0');
   localStorage.setItem('pagologo_recebido',(recebido+valor).toFixed(2));
-  showToast('Pagamento registrado! ✅');
+  showToast('✅ Marcado como pago!');
   showDetalhe(cAntes.id,voltarDetalhe);
 }
 
 // ── AUTH ──────────────────────────────────────────────────
-let currentTab='login';
-function switchTab(tab){
-  currentTab=tab;
-  document.getElementById('tab-login').classList.toggle('active',tab==='login');
-  document.getElementById('tab-cadastro').classList.toggle('active',tab==='cadastro');
-  document.getElementById('btn-auth').textContent=tab==='login'?'Entrar':'Criar conta';
-  document.getElementById('auth-error').classList.remove('show');
-  // Mostrar/ocultar campo confirmar senha
-  const confirmWrap=document.getElementById('wrap-confirmar-senha');
-  const esqueciWrap=document.getElementById('wrap-esqueci');
-  if(tab==='cadastro'){
-    confirmWrap.style.display='block';
-    esqueciWrap.style.display='none';
-    document.getElementById('auth-senha-confirm').value='';
-  } else {
-    confirmWrap.style.display='none';
-    esqueciWrap.style.display='block';
-  }
-}
 function showAuthError(msg){
   const el=document.getElementById('auth-error');el.textContent=msg;el.classList.add('show');
 }
@@ -1249,38 +1137,29 @@ async function fazerAuth(){
   const email=document.getElementById('auth-email').value.trim();
   const senha=document.getElementById('auth-senha').value;
   if(!email||!senha){showAuthError('Preencha e-mail e senha');return}
-  if(currentTab==='cadastro'){
-    const senhaConfirm=document.getElementById('auth-senha-confirm').value;
-    if(!senhaConfirm){showAuthError('Repita a senha');return}
-    if(senha!==senhaConfirm){showAuthError('As senhas não conferem');return}
-  }
-  const btn=document.getElementById('btn-auth');btn.disabled=true;btn.textContent='Aguarde...';
+  const btn=document.getElementById('btn-auth');
+  btn.disabled=true;btn.textContent='Aguarde...';
   document.getElementById('auth-error').classList.remove('show');
-  let result;
-  if(currentTab==='login'){result=await sb.auth.signInWithPassword({email,password:senha});}
-  else{result=await sb.auth.signUp({email,password:senha});}
-  btn.disabled=false;btn.textContent=currentTab==='login'?'Entrar':'Criar conta';
-  if(result.error){
-    const msgs={'Invalid login credentials':'E-mail ou senha incorretos','User already registered':'E-mail já cadastrado. Faça login.','Password should be at least 6 characters':'Senha mínima: 6 caracteres'};
-    showAuthError(msgs[result.error.message]||result.error.message);return;
+  const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+  btn.disabled=false;btn.textContent='Entrar';
+  if(error){
+    const msgs={
+      'Invalid login credentials':'E-mail ou senha incorretos',
+      'Email not confirmed':'Confirme seu e-mail antes de entrar'
+    };
+    showAuthError(msgs[error.message]||error.message);
+    return;
   }
-  if(currentTab==='cadastro'){
-    // Tenta logar direto após cadastro
-    if(result.data?.session){
-      entrarNoApp(result.data.user);return;
-    }
-    // Se email confirmation estiver ativo, faz login manual
-    const loginResult=await sb.auth.signInWithPassword({email,password:senha});
-    if(loginResult.error){showAuthError('Conta criada! Faça login agora.');switchTab('login');return;}
-    entrarNoApp(loginResult.data.user);return;
-  }
-  entrarNoApp(result.data.user);
+  entrarNoApp(data.user);
 }
 async function esqueceuSenha(){
   const email=document.getElementById('auth-email').value.trim();
   if(!email){showAuthError('Digite seu e-mail primeiro');return}
-  await sb.auth.resetPasswordForEmail(email);
-  showAuthError('✅ E-mail de recuperação enviado!');
+  const{error}=await sb.auth.resetPasswordForEmail(email,{
+    redirectTo:'https://guimachadoidvisual-cmd.github.io'
+  });
+  if(error){showAuthError('Erro: '+error.message);return}
+  showAuthError('✅ Link de redefinição enviado para seu e-mail!');
 }
 async function logout(){
   await sb.auth.signOut();
@@ -1288,82 +1167,11 @@ async function logout(){
   document.getElementById('auth-screen').classList.add('active');
   document.getElementById('auth-email').value='';
   document.getElementById('auth-senha').value='';
-  document.getElementById('auth-senha-confirm').value='';
-  switchTab('login');
 }
 async function entrarNoApp(user){
   currentUser=user;
   document.getElementById('auth-screen').classList.remove('active');
-  // Verifica assinatura
-  document.getElementById('loading-screen').style.display='flex';
-  const ativo=await checkSubscription(user);
-  if(!ativo){
-    mostrarPaywall();
-    return;
-  }
-  isPro=true;
-  await init();
-}
-
-// ── ASSINATURA KIWIFY ────────────────────────────────────
-async function checkSubscription(user){
-  if(!user)return false;
-  try{
-    // Verifica na tabela assinaturas pelo email do usuário
-    const{data,error}=await sb.from('assinaturas')
-      .select('*')
-      .eq('email',user.email?.toLowerCase())
-      .eq('status','active')
-      .single();
-    if(!error&&data){
-      // Atualiza user_id se ainda não tiver
-      if(!data.user_id){
-        await sb.from('assinaturas').update({user_id:user.id}).eq('email',user.email?.toLowerCase());
-      }
-      return true;
-    }
-    return false;
-  }catch(e){return false;}
-}
-
-function mostrarPaywall(){
-  document.getElementById('loading-screen').style.display='none';
-  document.getElementById('paywall-screen').classList.add('active');
-}
-
-function esconderPaywall(){
-  document.getElementById('paywall-screen').classList.remove('active');
-}
-
-function abrirKiwify(){
-  window.open(KIWIFY_URL,'_blank');
-  showToast('Após assinar, clique em "Verificar acesso"');
-}
-
-async function verificarAssinatura(){
-  if(!currentUser){showToast('Faça login primeiro');return;}
-  const btn=document.querySelector('#paywall-screen .btn-main');
-  const verBtn=document.querySelector('.paywall-already button');
-  if(verBtn){verBtn.textContent='Verificando...';verBtn.disabled=true;}
-  const ativo=await checkSubscription(currentUser);
-  if(verBtn){verBtn.textContent='Verificar acesso';verBtn.disabled=false;}
-  if(ativo){
-    isPro=true;
-    esconderPaywall();
-    await init();
-    showToast('✅ Acesso liberado!');
-  } else {
-    showToast('Assinatura não encontrada. Aguarde alguns minutos após assinar.');
-  }
-}
-
-async function sairPaywall(){
-  await sb.auth.signOut();
-  esconderPaywall();
-  document.getElementById('auth-screen').classList.add('active');
-  document.getElementById('auth-email').value='';
-  document.getElementById('auth-senha').value='';
-  switchTab('login');
+  init();
 }
 
 // ── START ─────────────────────────────────────────────────
