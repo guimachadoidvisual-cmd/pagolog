@@ -577,17 +577,17 @@ function closeHamburger(){
 async function salvarNome(){
   userName=document.getElementById('hm-nome').value.trim();
   if(!userName)return;
-  localStorage.setItem('pagologo_name',userName);
+  if(currentUser?.id)localStorage.setItem('pagologo_name_'+currentUser.id,userName);
   document.getElementById('home-username').textContent='Olá, '+userName+'! 👋';
-  await sb.from('config').upsert({chave:'nome_usuario',valor:userName,user_id:currentUser?.id},{onConflict:'chave'});
+  await sb.from('config').upsert({chave:'nome_usuario',valor:userName,user_id:currentUser?.id},{onConflict:'chave,user_id'});
   showToast('Nome salvo! ✅');
   closeHamburger();
 }
 async function loadNome(){
   const uid=currentUser?.id;if(!uid)return;
-  const{data}=await sb.from('config').select('*').eq('chave','nome_usuario').eq('user_id',uid).single();
-  if(data?.valor){userName=data.valor;localStorage.setItem('pagologo_name',userName);}
-  else{userName=localStorage.getItem('pagologo_name')||'';}
+  const{data}=await sb.from('config').select('*').eq('chave','nome_usuario').eq('user_id',uid).maybeSingle();
+  if(data?.valor){userName=data.valor;localStorage.setItem('pagologo_name_'+uid,userName);}
+  else{userName=localStorage.getItem('pagologo_name_'+uid)||'';}
 }
 
 // ── NAV ───────────────────────────────────────────────────
@@ -688,14 +688,14 @@ async function loadProdutos(){
 async function loadMensagem(){
   const uid=currentUser?.id;
   if(!uid)return;
-  const{data,error}=await sb.from('config').select('*').eq('chave','mensagem').eq('user_id',uid).single();
+  const{data,error}=await sb.from('config').select('*').eq('chave','mensagem').eq('user_id',uid).maybeSingle();
   if(!error&&data)msgTemplate=data.valor;
 }
 
 // ── HOME ──────────────────────────────────────────────────
 function renderHome(){
   const totalFalta=clientes.reduce((s,c)=>s+getTotal(c),0);
-  const totalRecebido=parseFloat(localStorage.getItem('pagologo_recebido')||'0');
+  const totalRecebido=parseFloat(localStorage.getItem('pagologo_recebido_'+(currentUser?.id||''))||'0');
   document.getElementById('stat-recebido').textContent='R$ '+totalRecebido.toFixed(2);
   document.getElementById('stat-falta').textContent='R$ '+totalFalta.toFixed(2);
   const el=document.getElementById('home-devedores');
@@ -1150,7 +1150,7 @@ function renderPreview(){
 async function salvarMensagem(){
   msgTemplate=document.getElementById('msg-editor').value;
   showSaving();
-  const{error}=await sb.from('config').upsert({chave:'mensagem',valor:msgTemplate,user_id:currentUser?.id},{onConflict:'chave'});
+  const{error}=await sb.from('config').upsert({chave:'mensagem',valor:msgTemplate,user_id:currentUser?.id},{onConflict:'chave,user_id'});
   if(error){showToast('Erro ao salvar');return}
   showToast('Mensagem salva! ✅');
 }
@@ -1177,8 +1177,9 @@ async function zerarDivida(id){
     return;
   }
   await loadClientes();
-  const recebido=parseFloat(localStorage.getItem('pagologo_recebido')||'0');
-  localStorage.setItem('pagologo_recebido',(recebido+valor).toFixed(2));
+  const recKey='pagologo_recebido_'+(currentUser?.id||'');
+  const recebido=parseFloat(localStorage.getItem(recKey)||'0');
+  localStorage.setItem(recKey,(recebido+valor).toFixed(2));
   showToast('✅ Marcado como pago!');
   showDetalhe(cAntes.id,voltarDetalhe);
 }
