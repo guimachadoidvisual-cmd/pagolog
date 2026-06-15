@@ -191,7 +191,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ── MODAL PRO / UPGRADE ── */
 .pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;align-items:flex-end}
 .pro-modal-overlay.open{display:flex}
-.pro-modal{background:#111;border-radius:28px 28px 0 0;padding:0 0 40px;width:100%;max-height:95vh;overflow-y:auto;border-top:2px solid rgba(245,158,11,.4)}
+.pro-modal{background:#111;border-radius:20px 20px 0 0;padding:0 0 50px;width:100%;max-height:92vh;overflow-y:auto;border-top:2px solid rgba(245,158,11,.4)}
 .pro-modal-header{background:linear-gradient(160deg,#1a1200,#1a0a00);padding:28px 24px 20px;text-align:center;border-bottom:1px solid rgba(245,158,11,.15)}
 .pro-modal-logo{font-size:11px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
 .pro-modal-title{font-size:26px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:8px}
@@ -216,7 +216,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .pro-feat-desc{font-size:12px;color:#666;line-height:1.4}
 .pro-cta{padding:0 24px}
 .pro-guarantee{text-align:center;font-size:11px;color:#555;margin-top:12px;line-height:1.5}
-.pro-close-btn{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:none;color:#888;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+/* pro-close-btn removido - agora é inline */
 
 /* HISTORICO */
 .hist-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;margin-bottom:10px;overflow:hidden}
@@ -325,11 +325,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <!-- MODAL PRO / UPGRADE -->
 <div class="pro-modal-overlay" id="pro-modal-overlay">
-  <div class="pro-modal" style="position:relative">
-    <button class="pro-close-btn" onclick="closeProModal()">✕</button>
+  <div class="pro-modal">
+    <!-- Botão fechar fixo e bem visível -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;position:sticky;top:0;background:#111;z-index:10;border-bottom:1px solid #1a1a1a">
+      <div style="font-size:13px;font-weight:700;color:#f59e0b;letter-spacing:.06em">✦ PAGOLOGO PRO</div>
+      <button onclick="closeProModal()" style="background:#2a2a2a;border:none;color:#aaa;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
 
-    <div class="pro-modal-header">
-      <div class="pro-modal-logo">✦ PagoLogo Pro</div>
+    <div class="pro-modal-header" style="padding-top:20px">
+      <div class="pro-modal-logo" style="display:none">✦ PagoLogo Pro</div>
       <div class="pro-modal-title">Desbloqueie tudo.<br>Venda sem limites.</div>
       <div class="pro-modal-sub">Gerencie clientes ilimitados, importe contatos e muito mais por menos que um café por dia.</div>
     </div>
@@ -1059,7 +1063,6 @@ function renderHome(){
   const totalRecebido=parseFloat(localStorage.getItem('pagologo_recebido_'+(currentUser?.id||''))||'0');
   document.getElementById('stat-recebido').textContent='R$ '+totalRecebido.toFixed(2);
   document.getElementById('stat-falta').textContent='R$ '+totalFalta.toFixed(2);
-  renderLimitBanner();
   const el=document.getElementById('home-devedores');
   const dev=clientes.filter(c=>getTotal(c)>0);
   if(!dev.length){el.innerHTML='<div class="empty">🎉 Ninguém deve nada!</div>';return}
@@ -1184,13 +1187,20 @@ function renderClientes(){
       bannerHTML=`<div class="limit-banner" style="margin-bottom:16px;border-color:rgba(239,68,68,.4)">
         <div class="limit-banner-icon">🚫</div>
         <div class="limit-banner-text">
-          <div class="limit-banner-title" style="color:#ef4444">Limite atingido (${n}/${LIMITE_FREE})</div>
-          <div class="limit-banner-sub">Assine o Pro para adicionar mais clientes.</div>
+          <div class="limit-banner-title" style="color:#ef4444">Limite atingido</div>
+          <div class="limit-banner-sub">Assine o Pro para clientes ilimitados.</div>
         </div>
-        <button class="limit-banner-btn" onclick="openProModal('clientes')">Assinar</button>
+        <button class="limit-banner-btn" onclick="openProModal('clientes')">Atualizar</button>
       </div>`;
     } else {
-      bannerHTML=`<div style="text-align:right;font-size:12px;color:#555;margin-bottom:10px">${n}/${LIMITE_FREE} clientes usados</div>`;
+      bannerHTML=`<div class="limit-banner" style="margin-bottom:16px">
+        <div class="limit-banner-icon">ℹ️</div>
+        <div class="limit-banner-text">
+          <div class="limit-banner-title">Plano Grátis</div>
+          <div class="limit-banner-sub">${n} de ${LIMITE_FREE} clientes usados.</div>
+        </div>
+        <button class="limit-banner-btn" onclick="openProModal('clientes')">Atualizar</button>
+      </div>`;
     }
   }
   // Botão importar: só mostra se pro E suporta contacts
