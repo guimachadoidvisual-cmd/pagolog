@@ -26,7 +26,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* AUTH */
-.auth-screen{display:none;position:fixed;inset:0;background:#111;z-index:9998;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.auth-screen{display:none;position:fixed;inset:0;background:#111;z-index:9998;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
 .auth-screen.active{display:flex}
 .auth-box{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:24px;padding:32px 24px;width:100%;max-width:400px}
 .auth-logo-wrap{display:flex;justify-content:center;margin-bottom:24px}
@@ -35,11 +35,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .auth-tab.active{background:#1a1a1a;color:var(--green);box-shadow:0 1px 4px rgba(0,0,0,.3)}
 .auth-error{background:#2a1a1a;color:#ef4444;border:1px solid #3a2a2a;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:12px;display:none}
 .auth-error.show{display:block}
+.auth-success{background:#1a2a1a;color:#22c55e;border:1px solid #2a3a2a;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:12px;display:none}
+.auth-success.show{display:block}
 .input-password-wrap{position:relative;margin-bottom:12px}
 .input-password-wrap .input-field{margin-bottom:0;padding-right:46px}
 .eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#555;padding:4px;display:flex;align-items:center;justify-content:center;-webkit-appearance:none}
 .eye-btn:active{color:#888}
-.cadastro-only{display:none}
 
 /* HEADER */
 .header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 20px}
@@ -50,7 +51,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* HAMBURGER MENU */
 .hm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500}
 .hm-overlay.open{display:block}
-.hm-panel{position:fixed;top:0;right:-300px;width:280px;height:100%;background:#1a1a1a;z-index:501;transition:right .3s;padding:24px 20px;display:flex;flex-direction:column;gap:8px}
+.hm-panel{position:fixed;top:0;right:-300px;width:280px;height:100%;background:#1a1a1a;z-index:501;transition:right .3s;padding:24px 20px;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
 .hm-panel.open{right:0}
 .hm-close{background:none;border:none;color:#888;font-size:24px;cursor:pointer;align-self:flex-end;margin-bottom:8px}
 .hm-item{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;cursor:pointer;font-size:15px;font-weight:500;color:#fff;background:none;border:none;width:100%;text-align:left;transition:background .15s}
@@ -58,6 +59,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hm-item.danger{color:var(--danger)}
 .hm-divider{height:1px;background:#2a2a2a;margin:4px 0}
 .hm-label{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.08em;padding:8px 14px 4px}
+/* badge pro no menu */
+.pro-badge{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;letter-spacing:.04em}
+.free-badge{background:#2a2a2a;color:#888;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
 
 /* SCREEN */
 .screen{display:none}.screen.active{display:block}
@@ -71,8 +75,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stat-lbl{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 .stat-val{font-size:26px;font-weight:800;color:#fff}
 .stat-box.green .stat-val{color:var(--green)}
-.cobrar-btn{width:100%;margin-top:12px;padding:10px;background:var(--green);color:#111;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none}
-.cobrar-btn:active{opacity:.85}
 .section-label{font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
 
 /* CARDS */
@@ -107,6 +109,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-danger{width:100%;padding:13px;background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.3);border-radius:14px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;-webkit-appearance:none}
 .btn-wpp{width:100%;padding:16px;background:#25D366;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;-webkit-appearance:none}
 .btn-wpp:active{opacity:.85}
+/* Botão gradiente PRO */
+.btn-pro{width:100%;padding:16px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;-webkit-appearance:none;box-shadow:0 4px 20px rgba(245,158,11,.3)}
+.btn-pro:active{opacity:.88}
 
 /* BACK BUTTON */
 .btn-back{background:none;border:none;color:#fff;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 0 16px;-webkit-appearance:none}
@@ -132,7 +137,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .summary-total{display:flex;justify-content:space-between;padding:13px 0 0;font-size:17px;font-weight:700;color:#fff}
 .info-block{margin-top:8px;padding:11px;background:#1a1a1a;border-radius:10px;font-size:13px;color:#888;border:1px solid #2a2a2a}
 
-/* IMPORT CONTATOS */
+/* IMPORTAR CONTATOS */
 .import-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer}
 .import-card input[type="checkbox"]{width:20px;height:20px;accent-color:var(--green);flex-shrink:0;cursor:pointer}
 
@@ -147,18 +152,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .fiado-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #222;font-size:13px;color:#888}
 .fiado-item span:last-child{font-weight:600;color:#fff}
 
-/* BOTTOM NAV — 4 itens centralizados */
+/* BOTTOM NAV */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;border-top:1px solid #2a2a2a;display:flex;justify-content:center;gap:0;padding:10px 0 24px;z-index:100;max-width:480px;margin:0 auto}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#555;cursor:pointer;padding:4px 28px;background:none;border:none;-webkit-appearance:none;transition:color .15s}
 .nav-item.active{color:var(--green)}
 .nav-item svg{width:22px;height:22px}
 
-/* FAB FLUTUANTE */
+/* FAB */
 .fab{position:fixed;bottom:90px;right:20px;background:var(--green);border-radius:50px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:0 6px 28px rgba(34,197,94,.45);z-index:200;border:none;-webkit-appearance:none;padding:15px 24px;font-size:15px;font-weight:700;color:#111;transition:transform .15s,opacity .2s}
 .fab:active{transform:scale(.95)}
 .fab.hidden{opacity:0;pointer-events:none;transform:scale(.85) translateY(10px)}
-.fab svg{width:20px;height:20px;flex-shrink:0}
-/* FAB FINALIZAR — centralizado acima do nav */
 .fab-fin{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--green);border-radius:50px;display:none;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:0 6px 28px rgba(34,197,94,.45);z-index:200;border:none;-webkit-appearance:none;padding:15px 36px;font-size:15px;font-weight:700;color:#111}
 .fab-fin:active{opacity:.85}
 .fab-fin.show{display:flex}
@@ -177,22 +180,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .saving-indicator.show{opacity:1}
 .empty{text-align:center;padding:40px 20px;color:#555;font-size:14px}
 
-/* PAYWALL */
-.paywall-screen{display:none;position:fixed;inset:0;background:#111;z-index:9997;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;overflow-y:auto}
-.paywall-screen.active{display:flex}
-.paywall-logo{margin-bottom:24px}
-.paywall-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.2}
-.paywall-sub{font-size:15px;color:#555;margin-bottom:28px;line-height:1.6}
-.paywall-box{background:#1a1a1a;border:1.5px solid rgba(34,197,94,.3);border-radius:22px;padding:24px;width:100%;max-width:360px;margin-bottom:20px;box-shadow:0 0 40px rgba(34,197,94,.08)}
-.paywall-price{font-size:42px;font-weight:900;color:#fff;margin-bottom:4px}
-.paywall-price span{font-size:16px;font-weight:400;color:#555}
-.paywall-features{margin:16px 0;display:flex;flex-direction:column;gap:10px}
-.paywall-feat{display:flex;align-items:center;gap:10px;font-size:13px;color:#aaa;text-align:left}
-.paywall-dot{width:20px;height:20px;border-radius:50%;background:rgba(34,197,94,.15);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.paywall-already{font-size:13px;color:#555;margin-top:4px}
-.paywall-already button{background:none;border:none;color:var(--green);font-size:13px;cursor:pointer;text-decoration:underline}
+/* ── LIMITE FREE BANNER ── */
+.limit-banner{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(239,68,68,.1));border:1px solid rgba(245,158,11,.35);border-radius:16px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.limit-banner-icon{font-size:24px;flex-shrink:0}
+.limit-banner-text{flex:1}
+.limit-banner-title{font-size:13px;font-weight:700;color:#f59e0b;margin-bottom:2px}
+.limit-banner-sub{font-size:12px;color:#888}
+.limit-banner-btn{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;-webkit-appearance:none}
 
-/* HISTÓRICO */
+/* ── MODAL PRO / UPGRADE ── */
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;align-items:flex-end}
+.pro-modal-overlay.open{display:flex}
+.pro-modal{background:#111;border-radius:28px 28px 0 0;padding:0 0 40px;width:100%;max-height:95vh;overflow-y:auto;border-top:2px solid rgba(245,158,11,.4)}
+.pro-modal-header{background:linear-gradient(160deg,#1a1200,#1a0a00);padding:28px 24px 20px;text-align:center;border-bottom:1px solid rgba(245,158,11,.15)}
+.pro-modal-logo{font-size:11px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+.pro-modal-title{font-size:26px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:8px}
+.pro-modal-sub{font-size:14px;color:#888;line-height:1.5}
+.pro-price-box{margin:20px 24px;background:#1a1a1a;border:1.5px solid rgba(245,158,11,.3);border-radius:20px;padding:20px;text-align:center;position:relative;overflow:hidden}
+.pro-price-box::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,158,11,.05),rgba(239,68,68,.03));pointer-events:none}
+.pro-price-tag{font-size:14px;color:#888;margin-bottom:4px}
+.pro-price-value{font-size:46px;font-weight:900;color:#fff;line-height:1}
+.pro-price-period{font-size:16px;font-weight:400;color:#666}
+.pro-price-note{font-size:12px;color:#f59e0b;margin-top:8px;font-weight:600}
+.pro-features{padding:0 24px;margin-bottom:20px}
+.pro-feat-title{font-size:12px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.pro-feat-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #1a1a1a}
+.pro-feat-item:last-child{border-bottom:none}
+.pro-feat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pro-feat-icon.gold{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2)}
+.pro-feat-icon.green{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2)}
+.pro-feat-icon.blue{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2)}
+.pro-feat-icon.red{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2)}
+.pro-feat-text{flex:1}
+.pro-feat-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.pro-feat-desc{font-size:12px;color:#666;line-height:1.4}
+.pro-cta{padding:0 24px}
+.pro-guarantee{text-align:center;font-size:11px;color:#555;margin-top:12px;line-height:1.5}
+.pro-close-btn{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:none;color:#888;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+
+/* HISTORICO */
 .hist-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;margin-bottom:10px;overflow:hidden}
 .hist-header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #222}
 .hist-badge{width:28px;height:28px;border-radius:50%;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -202,12 +228,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hist-item-row:last-child{border-bottom:none}
 .hist-footer{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid #222;background:rgba(34,197,94,.04)}
 
+/* SETUP BANNER */
+#setup-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:9990;background:#1a1a1a;border-bottom:2px solid #f59e0b;padding:16px 20px}
 </style>
 </head>
 <body>
 
 <!-- SETUP BANNER -->
-<div id="setup-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9990;background:#1a1a1a;border-bottom:2px solid #f59e0b;padding:16px 20px">
+<div id="setup-banner">
   <div style="font-size:13px;font-weight:700;color:#f59e0b;margin-bottom:8px">⚠️ Configure o banco de dados</div>
   <div style="font-size:12px;color:#aaa;margin-bottom:10px">Execute este SQL no <b>Supabase → SQL Editor</b> para ativar o histórico:</div>
   <div style="background:#111;border-radius:8px;padding:10px;font-size:11px;font-family:monospace;color:#22c55e;word-break:break-all;margin-bottom:10px">ALTER TABLE fiados ADD COLUMN IF NOT EXISTS pago boolean DEFAULT false;<br>ALTER TABLE fiados ADD COLUMN IF NOT EXISTS data_pago text;</div>
@@ -217,21 +245,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- LOADING -->
 <div class="loading-screen" id="loading-screen">
   <svg width="280" height="80" viewBox="0 0 420 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Moldura do celular -->
-  <rect x="4" y="4" width="90" height="112" rx="18" stroke="white" stroke-width="8" fill="none"/>
-  <!-- Barras do gráfico (brancas) -->
-  <rect x="18" y="72" width="14" height="32" rx="3" fill="white"/>
-  <rect x="38" y="56" width="14" height="48" rx="3" fill="white"/>
-  <rect x="58" y="40" width="14" height="64" rx="3" fill="white"/>
-  <!-- Linha do gráfico verde -->
-  <polyline points="18,68 38,52 55,60 80,18" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Seta verde -->
-  <polygon points="80,18 64,18 74,30" fill="#22c55e"/>
-  <!-- Texto Pago -->
-  <text x="108" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="white">Pago</text>
-  <!-- Texto Logo verde -->
-  <text x="250" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="#22c55e">Logo</text>
-</svg>
+    <rect x="4" y="4" width="90" height="112" rx="18" stroke="white" stroke-width="8" fill="none"/>
+    <rect x="18" y="72" width="14" height="32" rx="3" fill="white"/>
+    <rect x="38" y="56" width="14" height="48" rx="3" fill="white"/>
+    <rect x="58" y="40" width="14" height="64" rx="3" fill="white"/>
+    <polyline points="18,68 38,52 55,60 80,18" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <polygon points="80,18 64,18 74,30" fill="#22c55e"/>
+    <text x="108" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="white">Pago</text>
+    <text x="250" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="#22c55e">Logo</text>
+  </svg>
   <div class="spinner"></div>
 </div>
 
@@ -239,67 +261,141 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="auth-screen active" id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo-wrap">
-      <svg width="280" height="80" viewBox="0 0 420 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Moldura do celular -->
-  <rect x="4" y="4" width="90" height="112" rx="18" stroke="white" stroke-width="8" fill="none"/>
-  <!-- Barras do gráfico (brancas) -->
-  <rect x="18" y="72" width="14" height="32" rx="3" fill="white"/>
-  <rect x="38" y="56" width="14" height="48" rx="3" fill="white"/>
-  <rect x="58" y="40" width="14" height="64" rx="3" fill="white"/>
-  <!-- Linha do gráfico verde -->
-  <polyline points="18,68 38,52 55,60 80,18" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Seta verde -->
-  <polygon points="80,18 64,18 74,30" fill="#22c55e"/>
-  <!-- Texto Pago -->
-  <text x="108" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="white">Pago</text>
-  <!-- Texto Logo verde -->
-  <text x="250" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="#22c55e">Logo</text>
-</svg>
+      <svg width="240" height="68" viewBox="0 0 420 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="90" height="112" rx="18" stroke="white" stroke-width="8" fill="none"/>
+        <rect x="18" y="72" width="14" height="32" rx="3" fill="white"/>
+        <rect x="38" y="56" width="14" height="48" rx="3" fill="white"/>
+        <rect x="58" y="40" width="14" height="64" rx="3" fill="white"/>
+        <polyline points="18,68 38,52 55,60 80,18" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <polygon points="80,18 64,18 74,30" fill="#22c55e"/>
+        <text x="108" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="white">Pago</text>
+        <text x="250" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="#22c55e">Logo</text>
+      </svg>
     </div>
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">Bem-vindo de volta!</div>
-      <div style="font-size:13px;color:#555">Entre com seu e-mail e senha</div>
+
+    <!-- ABAS LOGIN / CADASTRO -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Entrar</button>
+      <button class="auth-tab" id="tab-cadastro" onclick="switchAuthTab('cadastro')">Criar conta</button>
     </div>
+
     <div class="auth-error" id="auth-error"></div>
-    <input class="input-field" id="auth-email" type="email" placeholder="Seu e-mail" autocomplete="email">
-    <div class="input-password-wrap">
-      <input class="input-field" id="auth-senha" type="password" placeholder="Senha" autocomplete="current-password">
-      <button class="eye-btn" type="button" onclick="toggleSenha('auth-senha','eye-senha')" id="eye-senha">
-        <svg id="eye-senha-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+    <div class="auth-success" id="auth-success"></div>
+
+    <!-- CAMPOS LOGIN -->
+    <div id="campos-login">
+      <input class="input-field" id="auth-email" type="email" placeholder="Seu e-mail" autocomplete="email">
+      <div class="input-password-wrap">
+        <input class="input-field" id="auth-senha" type="password" placeholder="Senha" autocomplete="current-password">
+        <button class="eye-btn" type="button" onclick="toggleSenha('auth-senha','eye-senha')" id="eye-senha">
+          <svg id="eye-senha-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <button class="btn-main" id="btn-auth" onclick="fazerLogin()">Entrar</button>
+      <div style="text-align:center">
+        <button onclick="esqueceuSenha()" style="background:none;border:none;color:#555;font-size:13px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button>
+      </div>
     </div>
-    <button class="btn-main" id="btn-auth" onclick="fazerAuth()">Entrar</button>
-    <div style="text-align:center" id="wrap-esqueci">
-      <button onclick="esqueceuSenha()" style="background:none;border:none;color:#555;font-size:13px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button>
+
+    <!-- CAMPOS CADASTRO -->
+    <div id="campos-cadastro" style="display:none">
+      <input class="input-field" id="cad-nome" type="text" placeholder="Seu nome" autocomplete="name">
+      <input class="input-field" id="cad-email" type="email" placeholder="Seu e-mail" autocomplete="email">
+      <div class="input-password-wrap">
+        <input class="input-field" id="cad-senha" type="password" placeholder="Senha (mín. 6 caracteres)" autocomplete="new-password">
+        <button class="eye-btn" type="button" onclick="toggleSenha('cad-senha','eye-cad')" id="eye-cad">
+          <svg id="eye-cad-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <div class="input-password-wrap">
+        <input class="input-field" id="cad-confirma" type="password" placeholder="Confirmar senha" autocomplete="new-password" style="margin-bottom:0;padding-right:46px">
+        <button class="eye-btn" type="button" onclick="toggleSenha('cad-confirma','eye-cad2')" id="eye-cad2">
+          <svg id="eye-cad2-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <div style="margin-bottom:14px"></div>
+      <button class="btn-main" id="btn-cadastrar" onclick="fazerCadastro()">Criar conta grátis</button>
+      <div style="text-align:center;font-size:12px;color:#444;line-height:1.5">
+        Ao criar, você concorda com os termos de uso.<br>Plano gratuito: até 5 clientes.
+      </div>
     </div>
+
   </div>
 </div>
 
-<!-- PAYWALL -->
-<div class="paywall-screen" id="paywall-screen">
-  <div class="paywall-logo">
-    <svg width="200" height="56" viewBox="0 0 420 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="4" width="90" height="112" rx="18" stroke="white" stroke-width="8" fill="none"/>
-      <rect x="18" y="72" width="14" height="32" rx="3" fill="white"/>
-      <rect x="38" y="56" width="14" height="48" rx="3" fill="white"/>
-      <rect x="58" y="40" width="14" height="64" rx="3" fill="white"/>
-      <polyline points="18,68 38,52 55,60 80,18" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <polygon points="80,18 64,18 74,30" fill="#22c55e"/>
-      <text x="108" y="82" font-family="-apple-system,sans-serif" font-size="58" font-weight="800" fill="white">Pago</text>
-      <text x="250" y="82" font-family="-apple-system,sans-serif" font-size="58" font-weight="800" fill="#22c55e">Logo</text>
-    </svg>
-  </div>
-  <div class="paywall-title">Acesso exclusivo<br>para assinantes</div>
-  <div class="paywall-sub">Assine o PagoLogo e controle<br>seus fiados sem papel.</div>
-  <div class="paywall-box" style="text-align:center">
-    <div style="font-size:15px;color:#aaa;line-height:1.7;margin-bottom:18px">
-      Sua assinatura não está ativa ou expirou.<br><br>
-      Após realizar o pagamento, sua conta é liberada automaticamente em poucos minutos.
+<!-- MODAL PRO / UPGRADE -->
+<div class="pro-modal-overlay" id="pro-modal-overlay">
+  <div class="pro-modal" style="position:relative">
+    <button class="pro-close-btn" onclick="closeProModal()">✕</button>
+
+    <div class="pro-modal-header">
+      <div class="pro-modal-logo">✦ PagoLogo Pro</div>
+      <div class="pro-modal-title">Desbloqueie tudo.<br>Venda sem limites.</div>
+      <div class="pro-modal-sub">Gerencie clientes ilimitados, importe contatos e muito mais por menos que um café por dia.</div>
     </div>
-    <button class="btn-main" style="margin-bottom:0" onclick="verificarAssinatura()">🔄 Verificar acesso</button>
-  </div>
-  <div style="margin-top:20px">
-    <button onclick="sairPaywall()" style="background:none;border:none;color:#333;font-size:12px;cursor:pointer">Sair da conta</button>
+
+    <div class="pro-price-box">
+      <div class="pro-price-tag">Apenas</div>
+      <div style="display:flex;align-items:flex-end;justify-content:center;gap:4px">
+        <div style="font-size:20px;font-weight:700;color:#888;padding-bottom:8px">R$</div>
+        <div class="pro-price-value">9<span style="font-size:28px;color:#aaa">,90</span></div>
+        <div class="pro-price-period" style="padding-bottom:10px">/mês</div>
+      </div>
+      <div class="pro-price-note">🔒 Pagamento seguro · Cancele quando quiser</div>
+    </div>
+
+    <div class="pro-features">
+      <div class="pro-feat-title">O que você ganha</div>
+
+      <div class="pro-feat-item">
+        <div class="pro-feat-icon gold">♾️</div>
+        <div class="pro-feat-text">
+          <div class="pro-feat-name">Clientes ilimitados</div>
+          <div class="pro-feat-desc">Sem teto. Cadastre quantos clientes precisar, para sempre.</div>
+        </div>
+      </div>
+
+      <div class="pro-feat-item">
+        <div class="pro-feat-icon green">📱</div>
+        <div class="pro-feat-text">
+          <div class="pro-feat-name">Importar contatos do celular</div>
+          <div class="pro-feat-desc">Importe sua lista de contatos em segundos, sem digitar nada.</div>
+        </div>
+      </div>
+
+      <div class="pro-feat-item">
+        <div class="pro-feat-icon blue">💬</div>
+        <div class="pro-feat-text">
+          <div class="pro-feat-name">Cobranças automáticas por WhatsApp</div>
+          <div class="pro-feat-desc">Mensagem personalizada com nome, total e resumo das compras.</div>
+        </div>
+      </div>
+
+      <div class="pro-feat-item">
+        <div class="pro-feat-icon red">📊</div>
+        <div class="pro-feat-text">
+          <div class="pro-feat-name">Histórico completo de pagamentos</div>
+          <div class="pro-feat-desc">Veja tudo que foi pago e quando, por cliente.</div>
+        </div>
+      </div>
+
+      <div class="pro-feat-item">
+        <div class="pro-feat-icon gold">⚡</div>
+        <div class="pro-feat-text">
+          <div class="pro-feat-name">Ativação automática</div>
+          <div class="pro-feat-desc">Após o pagamento, sua conta é atualizada em instantes. Sem perder nenhum dado.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pro-cta">
+      <button class="btn-pro" onclick="irParaCheckout()">
+        🚀 Assinar PagoLogo Pro — R$ 9,90/mês
+      </button>
+      <div class="pro-guarantee">
+        Já assinou? <button onclick="verificarAssinaturaPro()" style="background:none;border:none;color:var(--green);font-size:11px;cursor:pointer;text-decoration:underline;font-weight:600">Clique aqui para ativar</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -307,6 +403,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="hm-overlay" id="hm-overlay" onclick="closeHamburger()"></div>
 <div class="hm-panel" id="hm-panel">
   <button class="hm-close" onclick="closeHamburger()">✕</button>
+
+  <!-- BADGE PLANO -->
+  <div style="padding:12px 14px;background:#111;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-size:11px;color:#555;margin-bottom:4px">Seu plano</div>
+      <div style="font-size:14px;font-weight:700;color:#fff" id="hm-plano-label">Grátis</div>
+    </div>
+    <span id="hm-plano-badge" class="free-badge">FREE</span>
+  </div>
+
   <div class="hm-label">Conta</div>
   <div style="padding:12px 14px;background:#111;border-radius:12px;margin-bottom:8px">
     <div style="font-size:11px;color:#555;margin-bottom:6px">Usuário</div>
@@ -318,6 +424,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <button class="hm-item" onclick="closeHamburger();goTo('screen-mensagem')">
     <span>💬</span> Mensagem do WhatsApp
   </button>
+  <div id="hm-upgrade-btn-wrap">
+    <div class="hm-divider"></div>
+    <button class="hm-item" style="color:#f59e0b" onclick="closeHamburger();openProModal('menu')">
+      <span>⭐</span> Fazer upgrade para Pro
+    </button>
+  </div>
   <div class="hm-divider"></div>
   <button class="hm-item danger" onclick="logout()">
     <span>🚪</span> Sair
@@ -329,15 +441,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="header">
     <div class="header-logo" onclick="goTo('screen-home')">
       <svg width="150" height="44" viewBox="0 0 420 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="4" y="4" width="90" height="112" rx="18" stroke="white" stroke-width="8" fill="none"/>
-  <rect x="18" y="72" width="14" height="32" rx="3" fill="white"/>
-  <rect x="38" y="56" width="14" height="48" rx="3" fill="white"/>
-  <rect x="58" y="40" width="14" height="64" rx="3" fill="white"/>
-  <polyline points="18,68 38,52 55,60 80,18" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <polygon points="80,18 64,18 74,30" fill="#22c55e"/>
-  <text x="108" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="white">Pago</text>
-  <text x="250" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="#22c55e">Logo</text>
-</svg>
+        <rect x="4" y="4" width="90" height="112" rx="18" stroke="white" stroke-width="8" fill="none"/>
+        <rect x="18" y="72" width="14" height="32" rx="3" fill="white"/>
+        <rect x="38" y="56" width="14" height="48" rx="3" fill="white"/>
+        <rect x="58" y="40" width="14" height="64" rx="3" fill="white"/>
+        <polyline points="18,68 38,52 55,60 80,18" stroke="#22c55e" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <polygon points="80,18 64,18 74,30" fill="#22c55e"/>
+        <text x="108" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="white">Pago</text>
+        <text x="250" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="58" font-weight="800" fill="#22c55e">Logo</text>
+      </svg>
     </div>
     <button class="hamburger-btn" onclick="openHamburger()">
       <span></span><span></span><span></span>
@@ -356,9 +468,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="stat-box">
         <div class="stat-lbl">Falta receber</div>
         <div class="stat-val" id="stat-falta">R$ 0</div>
-        
       </div>
     </div>
+    <div id="home-limit-banner"></div>
     <div class="section-label">Cobranças pendentes</div>
     <div id="home-devedores"></div>
   </div>
@@ -387,7 +499,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="step-hint" id="hint-s2">Escolha os produtos</div>
     <input class="search-big" id="busca-produto" placeholder="🔍  Buscar produto..." oninput="renderProdutosVenda(this.value)" autocomplete="off">
     <div id="lista-produtos-venda"></div>
-    
   </div>
 
   <!-- VENDER S3 -->
@@ -413,8 +524,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Clientes
     </button>
-    <button class="btn-sec" onclick="abrirModalCliente(null)">+ Cadastrar cliente</button>
-    <button class="btn-sec" id="btn-importar-contatos" onclick="importarContatos()">📱 Importar contatos do telefone</button>
+    <button class="btn-sec" id="btn-add-cliente" onclick="tentarAddCliente()">+ Cadastrar cliente</button>
+    <button class="btn-sec" id="btn-importar-contatos" onclick="tentarImportarContatos()">📱 Importar contatos do telefone</button>
     <div id="lista-clientes"></div>
   </div>
 
@@ -472,19 +583,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </button>
 </nav>
 
-<!-- FAB VENDER — só na home -->
+<!-- FAB VENDER -->
 <button class="fab" id="fab-vender" onclick="goTo('screen-vender-s1')">
   <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   Vender
 </button>
 
-<!-- FAB FINALIZAR — só na tela de produtos da venda -->
+<!-- FAB FINALIZAR -->
 <button class="fab-fin" id="fab-finalizar" onclick="goTo('screen-vender-s3')">
   <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" width="20" height="20"><polyline points="20 6 9 17 4 12"/></svg>
   Finalizar
 </button>
-
-
 
 <!-- MODAL CLIENTE -->
 <div class="modal-overlay" id="modal-add-cliente">
@@ -535,15 +644,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="saving-indicator" id="saving-indicator">Salvando...</div>
 
 <script>
+/* ════════════════════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════════════════════ */
 const SUPABASE_URL='https://lxuexebyqjrpiugkaegz.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4dWV4ZWJ5cWpycGl1Z2thZWd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2ODIwODQsImV4cCI6MjA5NjI1ODA4NH0.3n-DBhFvjAp5oDwzdzj3BALarq7ccCRm1sTKsGKkrh4';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
+// ── LINK DO CHECKOUT IIFY (substitua pela URL real) ──
+const IIFY_CHECKOUT_URL='https://pay.kiwify.com.br/Eq7IUMT';
+
+// Contas PRO existentes que devem sempre ser Pro
+const PRO_EMAILS_FIXOS=['elianarodrigues469@gmail.com','estudospro1@gmail.com'];
+
+const LIMITE_FREE=5; // max clientes no plano grátis
+
+/* ════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════ */
 let clientes=[],produtos=[],msgTemplate=`Ola, {{nome}}!\n\nSegue o resumo do seu fiado:\n\n{{resumo}}\n\n*Total: {{total}}*\n\nQuando puder, me faz o pix!`;
 let vendaClienteId=null,vendaCarrinho={},editClienteId=null,voltarDetalhe='screen-home';
 let currentUser=null,userName='';
 let modoEdicaoFiado=false,editFiadoIdAtual=null,editFiadoDataAtual=null;
 let isPro=false;
+let proModalOrigem=null;
 
 const TAGS=[
   {id:'{{nome}}',label:'Primeiro nome'},{id:'{{nome_completo}}',label:'Nome completo'},
@@ -551,24 +675,225 @@ const TAGS=[
   {id:'{{num_compras}}',label:'Nº de compras'},{id:'{{data_hoje}}',label:'Data de hoje'},
 ];
 
-// ── HELPERS ───────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════ */
 function getTotal(c){return(c.fiados||[]).reduce((s,f)=>s+(f.itens||[]).reduce((a,i)=>a+i.preco*i.qtd,0),0)}
 function initials(n){const p=n.trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase()}
 function hojeISO(){const d=new Date();return d.toISOString().split('T')[0]}
 function hojeStr(){const d=new Date();return`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`}
 function hojeCompleto(){const d=new Date();return`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`}
 function isoToDisplay(iso){if(!iso)return hojeStr();const[y,m,d]=iso.split('-');return`${d}/${m}`}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+function showToast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#22c55e':'#ef4444';t.style.color=ok?'#111':'#fff';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 function showSaving(){const s=document.getElementById('saving-indicator');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),1500)}
 function openModal(id){document.getElementById(id).style.display='flex'}
 function closeModal(id){document.getElementById(id).style.display='none'}
 function setLoading(id,v,lbl='✅ Salvar'){const b=document.getElementById(id);if(!b)return;b.disabled=v;b.textContent=v?'Salvando...':lbl}
 
-// ── HAMBURGER ─────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   AUTH TABS
+════════════════════════════════════════════════════════ */
+function switchAuthTab(tab){
+  document.getElementById('tab-login').classList.toggle('active',tab==='login');
+  document.getElementById('tab-cadastro').classList.toggle('active',tab==='cadastro');
+  document.getElementById('campos-login').style.display=tab==='login'?'block':'none';
+  document.getElementById('campos-cadastro').style.display=tab==='cadastro'?'block':'none';
+  document.getElementById('auth-error').classList.remove('show');
+  document.getElementById('auth-success').classList.remove('show');
+}
+
+function showAuthError(msg){
+  const el=document.getElementById('auth-error');el.textContent=msg;el.classList.add('show');
+  document.getElementById('auth-success').classList.remove('show');
+}
+function showAuthSuccess(msg){
+  const el=document.getElementById('auth-success');el.textContent=msg;el.classList.add('show');
+  document.getElementById('auth-error').classList.remove('show');
+}
+
+function toggleSenha(inputId,btnId){
+  const inp=document.getElementById(inputId);
+  const isHidden=inp.type==='password';
+  inp.type=isHidden?'text':'password';
+  const icon=document.getElementById(btnId+'-icon');
+  if(isHidden){
+    icon.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    icon.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   LOGIN
+════════════════════════════════════════════════════════ */
+async function fazerLogin(){
+  const email=document.getElementById('auth-email').value.trim();
+  const senha=document.getElementById('auth-senha').value;
+  if(!email||!senha){showAuthError('Preencha e-mail e senha');return}
+  const btn=document.getElementById('btn-auth');
+  btn.disabled=true;btn.textContent='Aguarde...';
+  document.getElementById('auth-error').classList.remove('show');
+  const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+  btn.disabled=false;btn.textContent='Entrar';
+  if(error){
+    const msgs={'Invalid login credentials':'E-mail ou senha incorretos','Email not confirmed':'Confirme seu e-mail antes de entrar'};
+    showAuthError(msgs[error.message]||error.message);return;
+  }
+  entrarNoApp(data.user);
+}
+
+/* ════════════════════════════════════════════════════════
+   CADASTRO
+════════════════════════════════════════════════════════ */
+async function fazerCadastro(){
+  const nome=document.getElementById('cad-nome').value.trim();
+  const email=document.getElementById('cad-email').value.trim();
+  const senha=document.getElementById('cad-senha').value;
+  const confirma=document.getElementById('cad-confirma').value;
+  if(!nome||!email||!senha){showAuthError('Preencha todos os campos');return}
+  if(senha.length<6){showAuthError('A senha deve ter pelo menos 6 caracteres');return}
+  if(senha!==confirma){showAuthError('As senhas não coincidem');return}
+  const btn=document.getElementById('btn-cadastrar');
+  btn.disabled=true;btn.textContent='Criando conta...';
+  document.getElementById('auth-error').classList.remove('show');
+  const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{nome_usuario:nome}}});
+  btn.disabled=false;btn.textContent='Criar conta grátis';
+  if(error){showAuthError(error.message);return}
+  if(data?.user?.identities?.length===0){
+    showAuthError('Este e-mail já está cadastrado. Faça login.');
+    switchAuthTab('login');
+    document.getElementById('auth-email').value=email;
+    return;
+  }
+  // Salva nome no config após criar conta
+  if(data?.user){
+    userName=nome;
+    await sb.from('config').upsert({chave:'nome_usuario',valor:nome,user_id:data.user.id},{onConflict:'chave,user_id'});
+    // Login automático
+    const{data:loginData,error:loginErr}=await sb.auth.signInWithPassword({email,password:senha});
+    if(!loginErr&&loginData?.user){
+      entrarNoApp(loginData.user);
+      return;
+    }
+  }
+  showAuthSuccess('✅ Conta criada! Verifique seu e-mail para confirmar.');
+}
+
+async function esqueceuSenha(){
+  const email=document.getElementById('auth-email').value.trim();
+  if(!email){showAuthError('Digite seu e-mail primeiro');return}
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://guimachadoidvisual-cmd.github.io/pagolog'});
+  if(error){showAuthError('Erro: '+error.message);return}
+  showAuthSuccess('✅ Link de redefinição enviado para seu e-mail!');
+}
+
+async function logout(){
+  await sb.auth.signOut();
+  closeHamburger();
+  currentUser=null;isPro=false;clientes=[];produtos=[];
+  document.getElementById('auth-screen').classList.add('active');
+  document.getElementById('auth-email').value='';
+  document.getElementById('auth-senha').value='';
+  switchAuthTab('login');
+}
+
+/* ════════════════════════════════════════════════════════
+   ASSINATURA / PRO
+════════════════════════════════════════════════════════ */
+async function checkSubscription(user){
+  if(!user)return false;
+  // Emails fixos são sempre Pro
+  if(PRO_EMAILS_FIXOS.includes((user.email||'').toLowerCase()))return true;
+  try{
+    const{data,error}=await sb.from('assinaturas').select('*').eq('email',user.email?.toLowerCase()).eq('status','active').single();
+    if(!error&&data){
+      if(!data.user_id){await sb.from('assinaturas').update({user_id:user.id}).eq('email',user.email?.toLowerCase());}
+      return true;
+    }
+    return false;
+  }catch(e){return false;}
+}
+
+function atualizarUIPlano(){
+  const badge=document.getElementById('hm-plano-badge');
+  const label=document.getElementById('hm-plano-label');
+  const upgradeWrap=document.getElementById('hm-upgrade-btn-wrap');
+  if(isPro){
+    if(badge){badge.className='pro-badge';badge.textContent='PRO';}
+    if(label)label.textContent='Pro — Ilimitado';
+    if(upgradeWrap)upgradeWrap.style.display='none';
+  } else {
+    if(badge){badge.className='free-badge';badge.textContent='FREE';}
+    if(label)label.textContent='Grátis (até 5 clientes)';
+    if(upgradeWrap)upgradeWrap.style.display='block';
+  }
+}
+
+/* ── MODAL PRO ── */
+function openProModal(origem=''){
+  proModalOrigem=origem;
+  document.getElementById('pro-modal-overlay').classList.add('open');
+}
+function closeProModal(){
+  document.getElementById('pro-modal-overlay').classList.remove('open');
+}
+function irParaCheckout(){
+  // Passa o email do usuário para pré-preencher no checkout (se a Iify suportar)
+  const email=currentUser?.email||'';
+  const url=IIFY_CHECKOUT_URL+(email?`?email=${encodeURIComponent(email)}`:'');
+  window.open(url,'_blank');
+  // Após abrir o checkout, mostra botão de verificar
+  showToast('Após pagar, clique em "Ativar" no card acima ↑');
+}
+async function verificarAssinaturaPro(){
+  if(!currentUser){showToast('Faça login primeiro',false);return}
+  const btn=document.querySelector('#pro-modal-overlay .pro-guarantee button');
+  if(btn){btn.textContent='Verificando...';btn.disabled=true;}
+  const ativo=await checkSubscription(currentUser);
+  if(btn){btn.textContent='Clique aqui para ativar';btn.disabled=false;}
+  if(ativo){
+    isPro=true;
+    atualizarUIPlano();
+    closeProModal();
+    await loadClientes();
+    renderHome();
+    if(document.getElementById('screen-clientes').classList.contains('active'))renderClientes();
+    showToast('🎉 Plano Pro ativado!');
+  } else {
+    showToast('Assinatura não encontrada. Aguarde alguns minutos após pagar.',false);
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   LIMITE FREE — GUARDS
+════════════════════════════════════════════════════════ */
+function clientesCount(){return clientes.length;}
+function atingiuLimite(){return !isPro && clientesCount()>=LIMITE_FREE;}
+
+function tentarAddCliente(){
+  if(atingiuLimite()){
+    openProModal('add_cliente');
+    return;
+  }
+  abrirModalCliente(null);
+}
+
+function tentarImportarContatos(){
+  if(!isPro){
+    openProModal('importar');
+    return;
+  }
+  importarContatos();
+}
+
+/* ════════════════════════════════════════════════════════
+   HAMBURGER
+════════════════════════════════════════════════════════ */
 function openHamburger(){
   document.getElementById('hm-panel').classList.add('open');
   document.getElementById('hm-overlay').classList.add('open');
   document.getElementById('hm-nome').value=userName;
+  atualizarUIPlano();
 }
 function closeHamburger(){
   document.getElementById('hm-panel').classList.remove('open');
@@ -590,7 +915,9 @@ async function loadNome(){
   else{userName=localStorage.getItem('pagologo_name_'+uid)||'';}
 }
 
-// ── NAV ───────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   NAV
+════════════════════════════════════════════════════════ */
 function setActiveNav(id){
   ['nav-home','nav-clientes','nav-produtos','nav-mais'].forEach(n=>document.getElementById(n).classList.remove('active'));
   if(id)document.getElementById(id).classList.add('active');
@@ -600,19 +927,17 @@ function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
-  if(id==='screen-home'){renderHome();setActiveNav('nav-home')}
-  // FAB visibility
   const fabV=document.getElementById('fab-vender');
   const fabF=document.getElementById('fab-finalizar');
-  if(fabV)fabV.classList.toggle('hidden', id!=='screen-home');
-  if(fabF)fabF.classList.toggle('show', id==='screen-vender-s2');
+  if(fabV)fabV.classList.toggle('hidden',id!=='screen-home');
+  if(fabF)fabF.classList.toggle('show',id==='screen-vender-s2');
+  if(id==='screen-home'){renderHome();setActiveNav('nav-home')}
   if(id==='screen-clientes'){renderClientes();setActiveNav('nav-clientes')}
   if(id==='screen-produtos'){renderProdutos();setActiveNav('nav-produtos')}
   if(id==='screen-mensagem')initMensagem();
   if(id==='screen-vender-s1'){
     vendaClienteId=null;vendaCarrinho={};
     modoEdicaoFiado=false;editFiadoIdAtual=null;editFiadoDataAtual=null;
-    // Restaura botão voltar do S2
     const btnBackS2=document.querySelector('#screen-vender-s2 .btn-back');
     if(btnBackS2)btnBackS2.onclick=()=>goTo('screen-vender-s1');
     if(document.getElementById('busca-cliente'))document.getElementById('busca-cliente').value='';
@@ -624,7 +949,6 @@ function goTo(id){
     renderProdutosVenda('');
     const c=clientes.find(c=>c.id===vendaClienteId);
     document.getElementById('hint-s2').textContent=(modoEdicaoFiado?'Editando pedido de ':'Para ')+(c?c.nome:'');
-    // Título e botão confirmar
     document.querySelector('#screen-vender-s3 .btn-main').textContent=modoEdicaoFiado?'✅ Salvar edição':'✅ Confirmar fiado';
   }
   if(id==='screen-vender-s3'){
@@ -633,71 +957,109 @@ function goTo(id){
   }
 }
 
-// ── SETUP CHECK ───────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════ */
 async function checkSetup(){
-  // Testa se a coluna 'pago' existe na tabela fiados
   const{error}=await sb.from('fiados').select('pago').limit(1);
   if(error&&error.message.includes('pago')){
-    // Mostra banner com SQL
     document.getElementById('setup-banner').style.display='block';
   }
 }
+
+async function entrarNoApp(user){
+  currentUser=user;
+  document.getElementById('auth-screen').classList.remove('active');
+  document.getElementById('loading-screen').style.display='flex';
+  isPro=await checkSubscription(user);
+  await init();
+}
+
 async function init(){
   try{
     await Promise.all([loadClientes(),loadProdutos(),loadMensagem(),loadNome()]);
-  }catch(e){showToast('Erro ao carregar dados');console.error(e)}
-  // Esconde botão de importar contatos se não suportado (iOS/Safari)
-  if(!('contacts' in navigator && 'ContactsManager' in window)){
-    const btnImport=document.getElementById('btn-importar-contatos');
-    if(btnImport)btnImport.style.display='none';
+  }catch(e){showToast('Erro ao carregar dados',false);console.error(e)}
+  // Esconde botão importar se não suportado OU se free
+  const supContacts=('contacts' in navigator && 'ContactsManager' in window);
+  const btnImport=document.getElementById('btn-importar-contatos');
+  if(btnImport){
+    // Sempre mostra o botão, mas o click verifica pro
+    if(!supContacts && !isPro) btnImport.style.display='none';
+    else btnImport.style.display='block';
   }
   document.getElementById('loading-screen').style.display='none';
   document.getElementById('home-username').textContent=userName?'Olá, '+userName+'! 👋':'Olá! 👋';
+  atualizarUIPlano();
   renderHome();
   checkSetup();
 }
 
-// ── LOAD ──────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   LOAD DATA
+════════════════════════════════════════════════════════ */
 async function loadClientes(){
-  const uid=currentUser?.id;
-  if(!uid)return;
+  const uid=currentUser?.id;if(!uid)return;
   const{data:cs,error:ce}=await sb.from('clientes').select('*').eq('user_id',uid).order('nome');
   if(ce)throw ce;
   const{data:fs,error:fe}=await sb.from('fiados').select('*').order('created_at');
   if(fe)throw fe;
-
   clientes=(cs||[]).map(c=>{
     const todos=(fs||[]).filter(f=>f.cliente_id===c.id).map(f=>({
-      ...f,
-      itens:typeof f.itens==='string'?JSON.parse(f.itens||'[]'):(f.itens||[])
+      ...f,itens:typeof f.itens==='string'?JSON.parse(f.itens||'[]'):(f.itens||[])
     }));
-    return{
-      ...c,
-      fiados:todos.filter(f=>!f.pago),
-      pagamentos:todos.filter(f=>f.pago)
-    };
+    return{...c,fiados:todos.filter(f=>!f.pago),pagamentos:todos.filter(f=>f.pago)};
   });
 }
 async function loadProdutos(){
-  const uid=currentUser?.id;
-  if(!uid)return;
+  const uid=currentUser?.id;if(!uid)return;
   const{data,error}=await sb.from('produtos').select('*').eq('user_id',uid).order('nome');
   if(error)throw error;
   produtos=data||[];
 }
 async function loadMensagem(){
-  const uid=currentUser?.id;
-  if(!uid)return;
+  const uid=currentUser?.id;if(!uid)return;
   const{data,error}=await sb.from('config').select('*').eq('chave','mensagem').eq('user_id',uid).maybeSingle();
   if(!error&&data)msgTemplate=data.valor;
 }
 
-// ── HOME ──────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   HOME
+════════════════════════════════════════════════════════ */
+function renderLimitBanner(){
+  const el=document.getElementById('home-limit-banner');
+  if(!el)return;
+  if(isPro){el.innerHTML='';return}
+  const n=clientesCount();
+  const restam=Math.max(0,LIMITE_FREE-n);
+  if(n<LIMITE_FREE){
+    // Aviso suave
+    el.innerHTML=`<div class="limit-banner">
+      <div class="limit-banner-icon">ℹ️</div>
+      <div class="limit-banner-text">
+        <div class="limit-banner-title">Plano Grátis — ${restam} vaga(s) restante(s)</div>
+        <div class="limit-banner-sub">Você pode cadastrar até ${LIMITE_FREE} clientes no plano grátis.</div>
+      </div>
+      <button class="limit-banner-btn" onclick="openProModal('home_banner')">Ver Pro</button>
+    </div>`;
+  } else {
+    // Limite atingido
+    el.innerHTML=`<div class="limit-banner" style="border-color:rgba(239,68,68,.4)">
+      <div class="limit-banner-icon">🚫</div>
+      <div class="limit-banner-text">
+        <div class="limit-banner-title" style="color:#ef4444">Limite de clientes atingido</div>
+        <div class="limit-banner-sub">Assine o Pro para clientes ilimitados.</div>
+      </div>
+      <button class="limit-banner-btn" onclick="openProModal('limite')">Assinar</button>
+    </div>`;
+  }
+}
+
 function renderHome(){
   const totalFalta=clientes.reduce((s,c)=>s+getTotal(c),0);
   const totalRecebido=parseFloat(localStorage.getItem('pagologo_recebido_'+(currentUser?.id||''))||'0');
   document.getElementById('stat-recebido').textContent='R$ '+totalRecebido.toFixed(2);
   document.getElementById('stat-falta').textContent='R$ '+totalFalta.toFixed(2);
+  renderLimitBanner();
   const el=document.getElementById('home-devedores');
   const dev=clientes.filter(c=>getTotal(c)>0);
   if(!dev.length){el.innerHTML='<div class="empty">🎉 Ninguém deve nada!</div>';return}
@@ -712,9 +1074,9 @@ function renderHome(){
   });
 }
 
-
-
-// ── VENDER ────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   VENDER
+════════════════════════════════════════════════════════ */
 function renderClientesList(q){
   const f=clientes.filter(c=>c.nome.toLowerCase().includes((q||'').toLowerCase()));
   const el=document.getElementById('lista-clientes-venda');
@@ -726,10 +1088,7 @@ function renderClientesList(q){
       ${vendaClienteId===c.id?'<span style="color:var(--green);font-size:20px">✓</span>':''}
     </div>`).join('');
   el.querySelectorAll('[data-cid]').forEach(card=>{
-    card.addEventListener('click',()=>{
-      vendaClienteId=card.dataset.cid;
-      goTo('screen-vender-s2');
-    });
+    card.addEventListener('click',()=>{vendaClienteId=card.dataset.cid;goTo('screen-vender-s2');});
   });
 }
 
@@ -782,45 +1141,66 @@ function renderResumo(){
 
 async function confirmarVenda(){
   const c=clientes.find(c=>String(c.id)===String(vendaClienteId));
-  if(!c){showToast('Erro: cliente não encontrado');return;}
+  if(!c){showToast('Erro: cliente não encontrado',false);return;}
   const dataISO=document.getElementById('venda-data').value;
   const dataDisplay=dataISO?isoToDisplay(dataISO):hojeStr();
   const itens=Object.entries(vendaCarrinho).filter(([,q])=>q>0).map(([id,q])=>{
     const p=produtos.find(p=>String(p.id)===String(id));
     return p?{nome:p.nome,preco:Number(p.preco),qtd:q}:null;
   }).filter(Boolean);
-  if(!itens.length){showToast('Nenhum produto selecionado');return;}
+  if(!itens.length){showToast('Nenhum produto selecionado',false);return;}
   const btnConfirmar=document.querySelector('#screen-vender-s3 .btn-main');
   if(btnConfirmar){btnConfirmar.disabled=true;btnConfirmar.textContent='Salvando...';}
   showSaving();
   let error;
   if(modoEdicaoFiado&&editFiadoIdAtual){
-    // MODO EDIÇÃO: atualiza o fiado existente
     ({error}=await sb.from('fiados').update({data:dataDisplay,itens:JSON.stringify(itens)}).eq('id',editFiadoIdAtual));
     if(btnConfirmar){btnConfirmar.disabled=false;btnConfirmar.textContent='✅ Salvar edição';}
-    if(error){showToast('Erro ao salvar: '+error.message);return;}
+    if(error){showToast('Erro ao salvar: '+error.message,false);return;}
     await loadClientes();
     showToast('Pedido atualizado! ✅');
-    // Limpa modo edição
     modoEdicaoFiado=false;editFiadoIdAtual=null;editFiadoDataAtual=null;
     showDetalhe(c.id,voltarDetalhe);
   } else {
-    // MODO NORMAL: insere novo fiado
     ({error}=await sb.from('fiados').insert({cliente_id:c.id,data:dataDisplay,itens:JSON.stringify(itens)}));
     if(btnConfirmar){btnConfirmar.disabled=false;btnConfirmar.textContent='✅ Confirmar fiado';}
-    if(error){showToast('Erro ao salvar: '+error.message);return;}
+    if(error){showToast('Erro ao salvar: '+error.message,false);return;}
     await loadClientes();
     showToast('Fiado registrado para '+c.nome+'!');
     goTo('screen-home');
   }
 }
 
-// ── CLIENTES ──────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   CLIENTES
+════════════════════════════════════════════════════════ */
 function renderClientes(){
-  // Mostrar info de limite
   const el=document.getElementById('lista-clientes');
-  if(!clientes.length){el.innerHTML='<div class="empty">Nenhum cliente cadastrado</div>';return}
-  el.innerHTML=clientes.map(c=>`
+  // Banner de limite
+  let bannerHTML='';
+  if(!isPro){
+    const n=clientesCount();
+    if(n>=LIMITE_FREE){
+      bannerHTML=`<div class="limit-banner" style="margin-bottom:16px;border-color:rgba(239,68,68,.4)">
+        <div class="limit-banner-icon">🚫</div>
+        <div class="limit-banner-text">
+          <div class="limit-banner-title" style="color:#ef4444">Limite atingido (${n}/${LIMITE_FREE})</div>
+          <div class="limit-banner-sub">Assine o Pro para adicionar mais clientes.</div>
+        </div>
+        <button class="limit-banner-btn" onclick="openProModal('clientes')">Assinar</button>
+      </div>`;
+    } else {
+      bannerHTML=`<div style="text-align:right;font-size:12px;color:#555;margin-bottom:10px">${n}/${LIMITE_FREE} clientes usados</div>`;
+    }
+  }
+  // Botão importar: só mostra se pro E suporta contacts
+  const btnImport=document.getElementById('btn-importar-contatos');
+  if(btnImport){
+    const supContacts=('contacts' in navigator && 'ContactsManager' in window);
+    btnImport.style.display=(isPro&&supContacts)?'flex':'none';
+  }
+  if(!clientes.length){el.innerHTML=bannerHTML+'<div class="empty">Nenhum cliente cadastrado</div>';return}
+  el.innerHTML=bannerHTML+clientes.map(c=>`
     <div class="card card-click" data-cid="${c.id}">
       <div class="avatar">${initials(c.nome)}</div>
       <div class="card-info"><div class="card-name">${c.nome}</div><div class="card-sub">${c.tel}</div></div>
@@ -863,20 +1243,27 @@ function maskTel(input){
   else v=v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
   input.value=v;
 }
+
 async function saveCliente(){
   const nome=document.getElementById('novo-cliente-nome').value.trim();
   const tel=document.getElementById('novo-cliente-tel').value.trim().replace(/\D/g,'');
-  if(!nome||!tel){showToast('Preencha todos os campos');return}
+  if(!nome||!tel){showToast('Preencha todos os campos',false);return}
+  // Verificar limite no insert (não no edit)
+  if(!editClienteId && atingiuLimite()){
+    closeModal('modal-add-cliente');
+    openProModal('limite_save');
+    return;
+  }
   setLoading('btn-salvar-cliente',true);showSaving();
   let error;
   if(editClienteId){({error}=await sb.from('clientes').update({nome,tel}).eq('id',editClienteId));}
   else{({error}=await sb.from('clientes').insert({nome,tel,user_id:currentUser?.id}));}
   setLoading('btn-salvar-cliente',false);
-  if(error){showToast('Erro: '+error.message);return}
+  if(error){showToast('Erro: '+error.message,false);return}
   await loadClientes();
   closeModal('modal-add-cliente');
   renderClientes();
-  showToast(editClienteId?'Cliente atualizado!':'Cliente cadastrado!');
+  showToast(editClienteId?'Cliente atualizado!':'Cliente cadastrado! 🎉');
   editClienteId=null;
 }
 
@@ -888,7 +1275,6 @@ function confirmarExcluirCliente(id){
   document.getElementById('confirm-ok').onclick=async()=>{
     showSaving();
     await sb.from('fiados').delete().eq('cliente_id',c.id);
-    await sb.from('pagamentos').delete().eq('cliente_id',c.id);
     await sb.from('clientes').delete().eq('id',c.id);
     await loadClientes();
     closeModal('modal-confirm');renderClientes();showToast('Cliente excluído');
@@ -896,7 +1282,9 @@ function confirmarExcluirCliente(id){
   openModal('modal-confirm');
 }
 
-// ── DETALHE ───────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   DETALHE CLIENTE
+════════════════════════════════════════════════════════ */
 function renderHistorico(pagamentos,clienteId){
   if(!pagamentos||!pagamentos.length)return'';
   return`<div style="margin-top:20px">
@@ -982,38 +1370,30 @@ function showDetalhe(id,voltarPara){
           </div>
         </div>`).join(''):'<div class="empty" style="padding:20px 0">Nenhuma compra em aberto</div>'}
     </div>
-    ${renderHistorico(c.pagamentos, c.id)}
-    </div>`;
+    ${renderHistorico(c.pagamentos, c.id)}`;
   document.querySelector('[data-edit-det]')?.addEventListener('click',()=>abrirModalCliente(id));
   document.querySelector('[data-wpp]')?.addEventListener('click',()=>enviarWpp(id));
   document.querySelector('[data-zerar]')?.addEventListener('click',()=>zerarDivida(id));
   document.querySelectorAll('[data-edit-fiado]').forEach(btn=>btn.addEventListener('click',()=>abrirEditFiado(btn.dataset.editFiado,btn.dataset.fiadoCid)));
   document.querySelectorAll('[data-del-fiado]').forEach(btn=>btn.addEventListener('click',()=>confirmarExcluirFiado(btn.dataset.delFiado,btn.dataset.fiadoCid)));
-  // Excluir registro do histórico por índice
   document.querySelectorAll('[data-del-hist]').forEach(btn=>btn.addEventListener('click',()=>excluirHistoricoIdx(parseInt(btn.dataset.delHist),btn.dataset.histCid)));
   goTo('screen-cliente-detalhe');
 }
 
-// ── EDITAR / EXCLUIR FIADO ────────────────────────────────
-let editFiadoId=null,editFiadoClienteId=null;
-
+/* ════════════════════════════════════════════════════════
+   EDITAR / EXCLUIR FIADO
+════════════════════════════════════════════════════════ */
 function abrirEditFiado(fiadoId,clienteId){
   const c=clientes.find(c=>String(c.id)===String(clienteId));
   const f=(c?.fiados||[]).find(f=>String(f.id)===String(fiadoId));
   if(!f||!c)return;
-  // Configura modo edição
-  modoEdicaoFiado=true;
-  editFiadoIdAtual=fiadoId;
-  editFiadoDataAtual=f.data;
+  modoEdicaoFiado=true;editFiadoIdAtual=fiadoId;editFiadoDataAtual=f.data;
   vendaClienteId=String(clienteId);
-  // Pré-preenche carrinho com itens do fiado
   vendaCarrinho={};
   (f.itens||[]).forEach(item=>{
-    // Tenta achar o produto pelo nome para obter o id
     const prod=produtos.find(p=>p.nome.trim().toLowerCase()===item.nome.trim().toLowerCase());
     if(prod){vendaCarrinho[String(prod.id)]=item.qtd||1;}
   });
-  // Converte data dd/mm ou dd/mm/aaaa para ISO
   let dataISO=hojeISO();
   if(f.data){
     const parts=f.data.split('/');
@@ -1021,7 +1401,6 @@ function abrirEditFiado(fiadoId,clienteId){
     else if(parts.length===2){dataISO=`${new Date().getFullYear()}-${parts[1]}-${parts[0]}`;}
   }
   editFiadoDataAtual=dataISO;
-  // Vai direto para S2 (produtos)
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-vender-s2').classList.add('active');
   window.scrollTo(0,0);
@@ -1029,22 +1408,16 @@ function abrirEditFiado(fiadoId,clienteId){
   renderProdutosVenda('');
   document.getElementById('hint-s2').textContent='Editando pedido de '+c.nome;
   document.querySelector('#screen-vender-s3 .btn-main').textContent='✅ Salvar edição';
-  // Botão voltar do S2 vai para o detalhe
   document.querySelector('#screen-vender-s2 .btn-back').onclick=()=>{
     modoEdicaoFiado=false;editFiadoIdAtual=null;
     document.querySelector('#screen-vender-s2 .btn-back').onclick=()=>goTo('screen-vender-s1');
     showDetalhe(clienteId,voltarDetalhe);
   };
-  // FAB
   const fabV=document.getElementById('fab-vender');
   const fabF=document.getElementById('fab-finalizar');
   if(fabV)fabV.classList.add('hidden');
-  if(fabF){fabF.classList.add('show');}
-  // Pré-preenche a data na tela de resumo
-  setTimeout(()=>{
-    const inp=document.getElementById('venda-data');
-    if(inp)inp.value=editFiadoDataAtual;
-  },50);
+  if(fabF)fabF.classList.add('show');
+  setTimeout(()=>{const inp=document.getElementById('venda-data');if(inp)inp.value=editFiadoDataAtual;},50);
 }
 
 function confirmarExcluirFiado(fiadoId,clienteId){
@@ -1064,7 +1437,6 @@ function confirmarExcluirFiado(fiadoId,clienteId){
   openModal('modal-confirm');
 }
 
-// ── EXCLUIR HISTÓRICO ─────────────────────────────────────
 function excluirHistoricoIdx(idx,clienteId){
   const c=clientes.find(c=>String(c.id)===String(clienteId));
   if(!c)return;
@@ -1083,7 +1455,9 @@ function excluirHistoricoIdx(idx,clienteId){
   openModal('modal-confirm');
 }
 
-// ── PRODUTOS ──────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   PRODUTOS
+════════════════════════════════════════════════════════ */
 function renderProdutos(){
   const el=document.getElementById('lista-produtos');
   if(!produtos.length){el.innerHTML='<div class="empty">Nenhum produto cadastrado</div>';return}
@@ -1099,11 +1473,11 @@ function renderProdutos(){
 async function addProduto(){
   const nome=document.getElementById('novo-prod-nome').value.trim();
   const preco=parseFloat(document.getElementById('novo-prod-preco').value);
-  if(!nome||isNaN(preco)||preco<=0){showToast('Preencha todos os campos');return}
+  if(!nome||isNaN(preco)||preco<=0){showToast('Preencha todos os campos',false);return}
   setLoading('btn-salvar-produto',true);showSaving();
   const{error}=await sb.from('produtos').insert({nome,preco,user_id:currentUser?.id});
   setLoading('btn-salvar-produto',false);
-  if(error){showToast('Erro: '+error.message);return}
+  if(error){showToast('Erro: '+error.message,false);return}
   await loadProdutos();
   document.getElementById('novo-prod-nome').value='';
   document.getElementById('novo-prod-preco').value='';
@@ -1117,7 +1491,9 @@ async function removeProd(id){
   await loadProdutos();renderProdutos();showToast('Produto removido');
 }
 
-// ── MENSAGEM ──────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   MENSAGEM
+════════════════════════════════════════════════════════ */
 function initMensagem(){
   document.getElementById('msg-editor').value=msgTemplate;
   document.getElementById('tags-container').innerHTML=TAGS.map(t=>`<button class="tag-chip" data-tag="${t.id}">${t.label}</button>`).join('');
@@ -1151,11 +1527,13 @@ async function salvarMensagem(){
   msgTemplate=document.getElementById('msg-editor').value;
   showSaving();
   const{error}=await sb.from('config').upsert({chave:'mensagem',valor:msgTemplate,user_id:currentUser?.id},{onConflict:'chave,user_id'});
-  if(error){showToast('Erro ao salvar');return}
+  if(error){showToast('Erro ao salvar',false);return}
   showToast('Mensagem salva! ✅');
 }
 
-// ── COBRAR ────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   COBRAR / ZERAR
+════════════════════════════════════════════════════════ */
 function enviarWpp(id){
   const c=clientes.find(c=>String(c.id)===String(id));
   if(!c)return;
@@ -1164,17 +1542,14 @@ function enviarWpp(id){
 async function zerarDivida(id){
   showSaving();
   const cAntes=clientes.find(c=>String(c.id)===String(id));
-  if(!cAntes||!cAntes.fiados.length){showToast('Nenhuma compra em aberto');return;}
+  if(!cAntes||!cAntes.fiados.length){showToast('Nenhuma compra em aberto',false);return;}
   const valor=getTotal(cAntes);
   const hoje=hojeCompleto();
-  // Marca todos os fiados em aberto como pago=true
   const ids=cAntes.fiados.map(f=>f.id);
   const{error}=await sb.from('fiados').update({pago:true,data_pago:hoje}).in('id',ids);
   if(error){
-    // Se coluna pago não existir ainda, tenta criar via RPC ou avisa
-    showToast('Erro: adicione a coluna "pago" (boolean) na tabela fiados no Supabase');
-    console.error('Erro ao marcar pago:',error.message);
-    return;
+    showToast('Erro: adicione a coluna "pago" (boolean) na tabela fiados no Supabase',false);
+    console.error('Erro ao marcar pago:',error.message);return;
   }
   await loadClientes();
   const recKey='pagologo_recebido_'+(currentUser?.id||'');
@@ -1184,45 +1559,32 @@ async function zerarDivida(id){
   showDetalhe(cAntes.id,voltarDetalhe);
 }
 
-// ── IMPORTAR CONTATOS ─────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   IMPORTAR CONTATOS
+════════════════════════════════════════════════════════ */
 let importContatosLista=[];
 
 async function importarContatos(){
   if(!('contacts' in navigator && 'ContactsManager' in window)){
-    showToast('📱 Disponível apenas no Android (Chrome)');
-    return;
+    showToast('📱 Disponível apenas no Android (Chrome)',false);return;
   }
   try{
-    const props=['name','tel'];
-    const opts={multiple:true};
-    const contatos=await navigator.contacts.select(props,opts);
+    const contatos=await navigator.contacts.select(['name','tel'],{multiple:true});
     if(!contatos.length)return;
-
     importContatosLista=contatos.map((c,idx)=>{
       const nome=(c.name&&c.name[0])?c.name[0]:'Sem nome';
       let tel='';
-      if(c.tel&&c.tel[0]){
-        tel=c.tel[0].replace(/\D/g,'');
-        if(tel.length>11)tel=tel.slice(-11);
-      }
+      if(c.tel&&c.tel[0]){tel=c.tel[0].replace(/\D/g,'');if(tel.length>11)tel=tel.slice(-11);}
       return{id:idx,nome,tel,checked:!!tel};
     }).filter(c=>c.tel);
-
-    if(!importContatosLista.length){
-      showToast('Nenhum contato com telefone válido encontrado');
-      return;
-    }
-
+    if(!importContatosLista.length){showToast('Nenhum contato com telefone válido encontrado',false);return;}
     renderImportContatos();
     openModal('modal-import-contatos');
-  }catch(e){
-    console.error(e);
-    showToast('Importação cancelada ou erro ao acessar contatos');
-  }
+  }catch(e){console.error(e);showToast('Importação cancelada',false);}
 }
 
 function renderImportContatos(){
-  document.getElementById('import-count').textContent=`${importContatosLista.length} contato(s) encontrado(s) — desmarque os que não quiser importar`;
+  document.getElementById('import-count').textContent=`${importContatosLista.length} contato(s) encontrado(s)`;
   const el=document.getElementById('lista-import-contatos');
   el.innerHTML=importContatosLista.map(c=>`
     <label class="import-card">
@@ -1242,134 +1604,29 @@ function renderImportContatos(){
 
 async function confirmarImportContatos(){
   const selecionados=importContatosLista.filter(c=>c.checked);
-  if(!selecionados.length){showToast('Nenhum contato selecionado');return;}
+  if(!selecionados.length){showToast('Nenhum contato selecionado',false);return;}
   const btn=document.querySelector('#modal-import-contatos .btn-main');
   btn.disabled=true;btn.textContent='Importando...';
   showSaving();
   const rows=selecionados.map(c=>({nome:c.nome,tel:c.tel,user_id:currentUser?.id}));
   const{error}=await sb.from('clientes').insert(rows);
   btn.disabled=false;btn.textContent='✅ Importar selecionados';
-  if(error){showToast('Erro: '+error.message);return;}
+  if(error){showToast('Erro: '+error.message,false);return;}
   await loadClientes();
   closeModal('modal-import-contatos');
   renderClientes();
   showToast(`${selecionados.length} cliente(s) importado(s)! 🎉`);
 }
 
-// ── AUTH ──────────────────────────────────────────────────
-function showAuthError(msg){
-  const el=document.getElementById('auth-error');el.textContent=msg;el.classList.add('show');
-}
-function toggleSenha(inputId,btnId){
-  const inp=document.getElementById(inputId);
-  const isHidden=inp.type==='password';
-  inp.type=isHidden?'text':'password';
-  const icon=document.getElementById(btnId+'-icon');
-  if(isHidden){
-    icon.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
-  } else {
-    icon.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-  }
-}
-async function fazerAuth(){
-  const email=document.getElementById('auth-email').value.trim();
-  const senha=document.getElementById('auth-senha').value;
-  if(!email||!senha){showAuthError('Preencha e-mail e senha');return}
-  const btn=document.getElementById('btn-auth');
-  btn.disabled=true;btn.textContent='Aguarde...';
-  document.getElementById('auth-error').classList.remove('show');
-  const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
-  btn.disabled=false;btn.textContent='Entrar';
-  if(error){
-    const msgs={
-      'Invalid login credentials':'E-mail ou senha incorretos',
-      'Email not confirmed':'Confirme seu e-mail antes de entrar'
-    };
-    showAuthError(msgs[error.message]||error.message);
-    return;
-  }
-  entrarNoApp(data.user);
-}
-async function esqueceuSenha(){
-  const email=document.getElementById('auth-email').value.trim();
-  if(!email){showAuthError('Digite seu e-mail primeiro');return}
-  const{error}=await sb.auth.resetPasswordForEmail(email,{
-    redirectTo:'https://app.pagologo.com.br/'
-  });
-  if(error){showAuthError('Erro: '+error.message);return}
-  showAuthError('✅ Link de redefinição enviado para seu e-mail!');
-}
-async function logout(){
-  await sb.auth.signOut();
-  closeHamburger();
-  document.getElementById('auth-screen').classList.add('active');
-  document.getElementById('auth-email').value='';
-  document.getElementById('auth-senha').value='';
-}
-async function entrarNoApp(user){
-  currentUser=user;
-  document.getElementById('auth-screen').classList.remove('active');
-  document.getElementById('loading-screen').style.display='flex';
-  const ativo=await checkSubscription(user);
-  if(!ativo){
-    document.getElementById('loading-screen').style.display='none';
-    document.getElementById('paywall-screen').classList.add('active');
-    return;
-  }
-  isPro=true;
-  await init();
-}
-
-// ── ASSINATURA ────────────────────────────────────────────
-async function checkSubscription(user){
-  if(!user)return false;
-  try{
-    const{data,error}=await sb.from('assinaturas')
-      .select('*')
-      .eq('email',user.email?.toLowerCase())
-      .eq('status','active')
-      .single();
-    if(!error&&data){
-      if(!data.user_id){
-        await sb.from('assinaturas').update({user_id:user.id}).eq('email',user.email?.toLowerCase());
-      }
-      return true;
-    }
-    return false;
-  }catch(e){return false;}
-}
-
-async function verificarAssinatura(){
-  if(!currentUser){showToast('Faça login primeiro');return;}
-  const verBtn=document.querySelector('#paywall-screen .btn-main');
-  if(verBtn){verBtn.textContent='Verificando...';verBtn.disabled=true;}
-  const ativo=await checkSubscription(currentUser);
-  if(verBtn){verBtn.textContent='🔄 Verificar acesso';verBtn.disabled=false;}
-  if(ativo){
-    isPro=true;
-    document.getElementById('paywall-screen').classList.remove('active');
-    await init();
-    showToast('✅ Acesso liberado!');
-  }else{
-    showToast('Assinatura não encontrada. Aguarde alguns minutos após assinar.');
-  }
-}
-
-async function sairPaywall(){
-  await sb.auth.signOut();
-  document.getElementById('paywall-screen').classList.remove('active');
-  document.getElementById('auth-screen').classList.add('active');
-  document.getElementById('auth-email').value='';
-  document.getElementById('auth-senha').value='';
-}
-
-// ── START ─────────────────────────────────────────────────
+/* ════════════════════════════════════════════════════════
+   START
+════════════════════════════════════════════════════════ */
 sb.auth.getSession().then(({data:{session}})=>{
   if(session){entrarNoApp(session.user);}
   else{document.getElementById('loading-screen').style.display='none';}
 });
 sb.auth.onAuthStateChange((event,session)=>{
-  if(event==='SIGNED_IN'&&session)entrarNoApp(session.user);
+  if(event==='SIGNED_IN'&&session&&!currentUser)entrarNoApp(session.user);
 });
 </script>
 </body>
